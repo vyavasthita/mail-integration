@@ -67,6 +67,49 @@ class GmailApi:
     def disconnect(self):
         self.service.close()
 
+    def parse_message(self, message):
+        try:
+            # Get the message from its id
+            email_data = (
+                self.service.users()
+                .messages()
+                .get(userId="me", id=message["id"])
+                .execute()
+            )
+
+            # Get value of 'payload' from dictionary 'email_data'
+            # This returns a dictionary in which the key ‘payload‘
+            # contains the main content of Email in form of Dictionary.
+            payload = email_data["payload"]
+
+            # payload dictionary contains ‘headers‘, ‘parts‘, ‘filename‘ etc.
+            # So, we can now easily find headers such as sender, subject, etc. from here.
+            headers = payload["headers"]
+
+            sender = None
+            subject = None
+            dateofemail = None
+
+            # Look for Subject and Sender Email in the headers
+            for header in headers:
+                if header["name"] == "From":
+                    sender = header["value"]
+
+                if header["name"] == "Subject":
+                    subject = header["value"]
+
+                if header["name"] == "Date":
+                    dateofemail = header["value"]
+
+            # Printing the subject, sender's email and message
+            print("Message ID: ", message["id"])
+            print("Subject: ", subject)
+            print("From: ", sender)
+            print("Date: ", dateofemail)
+            print("********************************************")
+        except HttpError as error:
+            print(f"Error occurred while parsing email message. {str(error)}")
+
     def fetch_messages(self):
         """
         Once connected, we will request a list of messages.
@@ -96,47 +139,11 @@ class GmailApi:
 
     def parse_messages(self):
         # messages is a list of dictionaries where each dictionary contains a message id
+        messages = self.fetch_messages()
+
+        if not messages:
+            print("No messages where found.")
+            return
+
         for message in self.fetch_messages():
-            # Get the message from its id
-
-            email_data = (
-                self.service.users()
-                .messages()
-                .get(userId="me", id=message["id"])
-                .execute()
-            )
-
-            # Get value of 'payload' from dictionary 'email_data'
-            # This returns a dictionary in which the key ‘payload‘
-            # contains the main content of Email in form of Dictionary.
-            payload = email_data["payload"]
-
-            # payload dictionary contains ‘headers‘, ‘parts‘, ‘filename‘ etc.
-            # So, we can now easily find headers such as sender, subject, etc. from here.
-            headers = payload["headers"]
-
-            messaged_id = None
-            sender = None
-            subject = None
-            dateofemail = None
-
-            # Look for Subject and Sender Email in the headers
-            for header in headers:
-                if header["name"] == "Message-ID":
-                    messaged_id = header["value"]
-
-                if header["name"] == "From":
-                    sender = header["value"]
-
-                if header["name"] == "Subject":
-                    subject = header["value"]
-
-                if header["name"] == "Date":
-                    dateofemail = header["value"]
-
-            # Printing the subject, sender's email and message
-            print("Message ID: ", message["id"])
-            print("Subject: ", subject)
-            print("From: ", sender)
-            print("Date: ", dateofemail)
-            print("********************************************")
+            self.parse_message(message=message)
