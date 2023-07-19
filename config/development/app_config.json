@@ -1,6 +1,14 @@
 {
-    "MAX_EMAIL_READ": 3,
-    "labels": [
-        "INBOX"
-    ]
+    "api": {
+        "scope": [
+            "https://www.googleapis.com/auth/gmail.readonly",
+            "https://www.googleapis.com/auth/gmail.modify"
+        ]
+    },
+    "message": {
+        "max_email_read": 3,
+        "labels": [
+            "INBOX"
+        ]
+    }
 }

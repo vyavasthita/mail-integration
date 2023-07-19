@@ -43,7 +43,7 @@ class GmailApi:
         # If scopes is modified, we should delete the file token.json
         if os.path.exists(self.token_json):
             self.creds = Credentials.from_authorized_user_file(
-                "token.json", scopes=env_configuration.SCOPES
+                "token.json", scopes=app_configuration.api_config.scope
             )
 
     def user_log_in(self):
@@ -69,7 +69,7 @@ class GmailApi:
 
     def run_auth_flow(self):
         flow = InstalledAppFlow.from_client_secrets_file(
-            self.auth_credential_json, scopes=env_configuration.SCOPES
+            self.auth_credential_json, scopes=app_configuration.api_config.scope
         )
         return flow.run_local_server(port=0)
 
@@ -165,8 +165,8 @@ class GmailApi:
                 .messages()
                 .list(
                     userId=env_configuration.USER_ID,
-                    maxResults=app_configuration.max_email_read,
-                    labelIds=app_configuration.labels,
+                    maxResults=app_configuration.message_config.max_email_read,
+                    labelIds=app_configuration.message_config.labels,
                 )
                 .execute()
             )

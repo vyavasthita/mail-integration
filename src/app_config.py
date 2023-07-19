@@ -4,9 +4,20 @@ from utils.json_reader import JsonReader
 
 
 @dataclass
-class AppConfigData:
+class ApiConfigData:
+    scope: List[str] = field(default_factory=list)
+
+
+@dataclass
+class MessageConfigData:
     max_email_read: int = 100
     labels: List[str] = field(default_factory=list)
+
+
+@dataclass
+class AppConfigData:
+    api_config: ApiConfigData = field(default_factory=ApiConfigData)
+    message_config: MessageConfigData = field(default_factory=MessageConfigData)
 
 
 @dataclass
@@ -17,4 +28,9 @@ class AppConfigParser:
     def parse(self):
         json_reader = JsonReader(self.file_path)
         self.data = json_reader.read()
-        return AppConfigData(max_email_read=self.data["MAX_EMAIL_READ"], labels=self.data["labels"])
+        api_config = ApiConfigData(scope=self.data["api"]["scope"])
+        msg_config = MessageConfigData(
+            max_email_read=self.data["message"]["max_email_read"],
+            labels=self.data["message"]["labels"],
+        )
+        return AppConfigData(api_config=api_config, message_config=msg_config)
