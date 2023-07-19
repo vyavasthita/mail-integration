@@ -12,26 +12,27 @@ class RuleParser(ABC):
 
 
 class JsonRuleParser(RuleParser):
-    RULE_PARSER_FILE_PATH = "config/email_rules.json"
-
-    def __init__(self):
-        self.data = None
+    def __init__(self, file_path: str):
+        self.file_path = file_path
         self.rules = None
         self.read_configuration()
 
     def read_configuration(self):
-        if os.path.exists(JsonRuleParser.RULE_PARSER_FILE_PATH):
-            with open(JsonRuleParser.RULE_PARSER_FILE_PATH) as json_file_object:
-                self.rules = json.load(json_file_object)
+        if os.path.exists(self.file_path):
+            try:
+                with open(self.file_path) as json_file_object:
+                    self.rules = json.load(json_file_object)
+            except ValueError as error:
+                print(f"Invalid Json File. {self.file_path}")
         else:
             raise ValueError(
                 "Connection configuration file path '{}' is invalid.".format(
-                    JsonRuleParser.RULE_PARSER_FILE_PATH
+                    self.file_path
                 )
             )
 
     def parse(self):
-        pass
+        return self.rules
 
     def get_rule(self, rule_name):
         for rule in self.rules:
