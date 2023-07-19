@@ -21,6 +21,7 @@ class MailField:
     receiver: str = None
     subject: str = None
     date: str = None
+    body: str = None
 
 
 @dataclass
@@ -98,6 +99,18 @@ class GmailApi:
             if header["name"] == "Date":
                 mail_field.date = header["value"]
 
+    def parse_body(self, parts, mail_field: MailField):
+        # Get the data and decode it with base 64 decoder.
+        if parts["body"].get("data"):
+            data = parts["body"]["data"]
+            data = data.replace("-", "+").replace("_", "/")
+            decoded_data = base64.b64decode(data)
+
+            # Now, the data obtained is in lxml. So, we will parse
+            # it with BeautifulSoup library
+            soup = BeautifulSoup(decoded_data, "lxml")
+            mail_field.body = soup.body()
+
     def parse_message(self, message):
         mail_field = MailField()
 
@@ -122,6 +135,9 @@ class GmailApi:
             mail_field.message_id = message["id"]
 
             self.parse_msg_attributes(headers=headers, mail_field=mail_field)
+
+            if payload.get("parts"):
+                self.parse_body(parts=payload.get("parts")[0], mail_field=mail_field)
 
             self.mails.append(mail_field)
 
