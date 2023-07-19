@@ -12,9 +12,19 @@ write_to_json(
     out_file_path=out_json_file_path,
 )
 
-
 gmail_api = GmailApi(auth_credential_json=out_json_file_path)
 gmail_api.check_already_authenticated()
 gmail_api.user_log_in()
 gmail_api.connect()
-gmail_api.parse_messages()
+
+for mail in gmail_api.parse_messages():
+    # Printing the subject, sender's email and message
+    print("Message ID: ", mail.message_id)
+    print("From: ", mail.sender)
+    print("To: ", mail.receiver)
+    print("Subject: ", mail.subject)
+    print("Date: ", mail.date)
+    if mail.body:
+        print("Body: ", mail.body)
+    print("Labels: ", mail.labels)
+    print("********************************************")

@@ -22,6 +22,7 @@ class MailField:
     subject: str = None
     date: str = None
     body: str = None
+    labels: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -85,7 +86,6 @@ class GmailApi:
     def parse_msg_attributes(self, headers: dict, mail_field: MailField):
         # payload dictionary contains ‘headers‘, ‘parts‘, ‘filename‘ etc.
         # So, we can now easily find headers such as sender, subject, etc. from here.
-
         for header in headers:
             if header["name"] == "From":
                 mail_field.sender = header["value"]
@@ -111,7 +111,7 @@ class GmailApi:
             soup = BeautifulSoup(decoded_data, "lxml")
             mail_field.body = soup.body()
 
-    def parse_message(self, message):
+    def get_message_detail(self, message):
         mail_field = MailField()
 
         try:
@@ -119,9 +119,11 @@ class GmailApi:
             email_data = (
                 self.service.users()
                 .messages()
-                .get(userId="me", id=message["id"])
+                .get(userId=configuration.USER_ID, id=message["id"])
                 .execute()
             )
+            # Fetch labels
+            mail_field.labels = email_data["labelIds"]
 
             # Get value of 'payload' from dictionary 'email_data'
             # This returns a dictionary in which the key ‘payload‘
@@ -151,14 +153,17 @@ class GmailApi:
         This will return a list of IDs of the last 100 emails (default value)
         for that Gmail account. We can ask for any number of Emails by
         passing an optional argument ‘maxResults‘.
+
+        Ref: https://googleapis.github.io/google-api-python-client/docs/dyn/gmail_v1.users.messages.html#list
+
+        Each message resource contains only an `id` and a `threadId`. Additional message details can be fetched using the messages.get method.
         """
         try:
             results = (
                 self.service.users()
                 .messages()
                 .list(
-                    userId="me",
-                    labelIds=["INBOX"],
+                    userId=configuration.USER_ID,
                     maxResults=configuration.MAX_EMAIL_READ,
                 )
                 .execute()
@@ -176,10 +181,10 @@ class GmailApi:
         messages = self.fetch_messages()
 
         if not messages:
-            print("No messages where found.")
+            print("No messages were found.")
             return
 
         for message in self.fetch_messages():
-            self.parse_message(message=message)
+            self.get_message_detail(message=message)
 
         return self.mails
