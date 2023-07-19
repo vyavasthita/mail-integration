@@ -3,7 +3,8 @@ from __future__ import print_function
 import os.path
 import base64
 from bs4 import BeautifulSoup
-from dataclasses import dataclass
+from typing import List
+from dataclasses import dataclass, field
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -11,6 +12,15 @@ from googleapiclient.discovery import build, Resource
 from googleapiclient.errors import HttpError
 from utils.file_helper import write_to_file, delete_file
 from src import configuration
+
+
+@dataclass
+class MailField:
+    message_id: str = None
+    sender: str = None
+    receiver: str = None
+    subject: str = None
+    date: str = None
 
 
 @dataclass
@@ -25,6 +35,7 @@ class GmailApi:
     token_json: str = "token.json"
     creds: Credentials = None
     service: Resource = None
+    mails: List[MailField] = field(default_factory=list)
 
     def check_already_authenticated(self):
         # If scopes is modified, we should delete the file token.json
@@ -70,7 +81,26 @@ class GmailApi:
     def disconnect(self):
         self.service.close()
 
+    def parse_msg_attributes(self, headers: dict, mail_field: MailField):
+        # payload dictionary contains ‘headers‘, ‘parts‘, ‘filename‘ etc.
+        # So, we can now easily find headers such as sender, subject, etc. from here.
+
+        for header in headers:
+            if header["name"] == "From":
+                mail_field.sender = header["value"]
+
+            if header["name"] == "To":
+                mail_field.receiver = header["value"]
+
+            if header["name"] == "Subject":
+                mail_field.subject = header["value"]
+
+            if header["name"] == "Date":
+                mail_field.date = header["value"]
+
     def parse_message(self, message):
+        mail_field = MailField()
+
         try:
             # Get the message from its id
             email_data = (
@@ -89,27 +119,12 @@ class GmailApi:
             # So, we can now easily find headers such as sender, subject, etc. from here.
             headers = payload["headers"]
 
-            sender = None
-            subject = None
-            dateofemail = None
+            mail_field.message_id = message["id"]
 
-            # Look for Subject and Sender Email in the headers
-            for header in headers:
-                if header["name"] == "From":
-                    sender = header["value"]
+            self.parse_msg_attributes(headers=headers, mail_field=mail_field)
 
-                if header["name"] == "Subject":
-                    subject = header["value"]
+            self.mails.append(mail_field)
 
-                if header["name"] == "Date":
-                    dateofemail = header["value"]
-
-            # Printing the subject, sender's email and message
-            print("Message ID: ", message["id"])
-            print("Subject: ", subject)
-            print("From: ", sender)
-            print("Date: ", dateofemail)
-            print("********************************************")
         except HttpError as error:
             print(f"Error occurred while parsing email message. {str(error)}")
 
@@ -150,3 +165,5 @@ class GmailApi:
 
         for message in self.fetch_messages():
             self.parse_message(message=message)
+
+        return self.mails
