@@ -1,6 +1,6 @@
 import os
-from src.config import config_by_name
+from src.env_config import config_by_name
 
 environment = os.getenv("BUILD_ENV") or "development"
 
-configuration = config_by_name[environment]
+env_configuration = config_by_name[environment]

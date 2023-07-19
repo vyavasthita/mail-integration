@@ -11,7 +11,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build, Resource
 from googleapiclient.errors import HttpError
 from utils.file_helper import write_to_file, delete_file
-from src import configuration
+from src import env_configuration
 
 
 @dataclass
@@ -43,7 +43,7 @@ class GmailApi:
         # If scopes is modified, we should delete the file token.json
         if os.path.exists(self.token_json):
             self.creds = Credentials.from_authorized_user_file(
-                "token.json", scopes=configuration.SCOPES
+                "token.json", scopes=env_configuration.SCOPES
             )
 
     def user_log_in(self):
@@ -69,7 +69,7 @@ class GmailApi:
 
     def run_auth_flow(self):
         flow = InstalledAppFlow.from_client_secrets_file(
-            self.auth_credential_json, scopes=configuration.SCOPES
+            self.auth_credential_json, scopes=env_configuration.SCOPES
         )
         return flow.run_local_server(port=0)
 
@@ -119,9 +119,10 @@ class GmailApi:
             email_data = (
                 self.service.users()
                 .messages()
-                .get(userId=configuration.USER_ID, id=message["id"])
+                .get(userId=env_configuration.USER_ID, id=message["id"])
                 .execute()
             )
+
             # Fetch labels
             mail_field.labels = email_data["labelIds"]
 
@@ -163,8 +164,8 @@ class GmailApi:
                 self.service.users()
                 .messages()
                 .list(
-                    userId=configuration.USER_ID,
-                    maxResults=configuration.MAX_EMAIL_READ,
+                    userId=env_configuration.USER_ID,
+                    maxResults=env_configuration.MAX_EMAIL_READ,
                 )
                 .execute()
             )

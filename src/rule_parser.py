@@ -1,40 +1,20 @@
-from abc import ABC, abstractmethod
 import os
 import json
+from dataclasses import dataclass
+from utils.json_reader import JsonReader
 
 
-class RuleParser(ABC):
-    @abstractmethod
-    def read_configuration(self):
-        raise NotImplementedError(
-            "Abstract method 'read_configuration' needs implementation."
-        )
-
-
-class JsonRuleParser(RuleParser):
-    def __init__(self, file_path: str):
-        self.file_path = file_path
-        self.rules = None
-        self.read_configuration()
-
-    def read_configuration(self):
-        if os.path.exists(self.file_path):
-            try:
-                with open(self.file_path) as json_file_object:
-                    self.rules = json.load(json_file_object)
-            except ValueError as error:
-                print(f"Invalid Json File. {self.file_path}")
-        else:
-            raise ValueError(
-                "Connection configuration file path '{}' is invalid.".format(
-                    self.file_path
-                )
-            )
+@dataclass
+class RuleParser:
+    file_path: str
+    data: dict = None
 
     def parse(self):
-        return self.rules
+        json_reader = JsonReader(self.file_path)
+        self.data = json_reader.read()
+        return self.data
 
     def get_rule(self, rule_name):
-        for rule in self.rules:
+        for rule in self.data:
             if rule_name == rule.get("rule"):
-                return json.dumps(self.rules, indent=1)
+                return json.dumps(self.data, indent=1)
