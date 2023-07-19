@@ -33,7 +33,7 @@ class GmailApi:
     time.
     """
 
-    auth_credential_json: str
+    auth_credential_json: str = "credentials.json"
     token_json: str = "token.json"
     creds: Credentials = None
     service: Resource = None
@@ -166,6 +166,7 @@ class GmailApi:
                 .list(
                     userId=env_configuration.USER_ID,
                     maxResults=app_configuration.max_email_read,
+                    labelIds=app_configuration.labels,
                 )
                 .execute()
             )

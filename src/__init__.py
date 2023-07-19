@@ -9,10 +9,9 @@ env_configuration = config_by_name[environment]
 
 
 app_config_file_path = os.path.join(
-    os.getcwd(), "config", environment, "msg_config.json"
+    os.getcwd(), "config", environment, "app_config.json"
 )
 
 app_config_parser = AppConfigParser(file_path=app_config_file_path)
 
 app_configuration = app_config_parser.parse()
-
