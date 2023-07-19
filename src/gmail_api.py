@@ -9,7 +9,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build, Resource
 from googleapiclient.errors import HttpError
-from utils.file_helper import write_to_file
+from utils.file_helper import write_to_file, delete_file
 from src import configuration
 
 
@@ -50,6 +50,9 @@ class GmailApi:
         else:
             # Open the browser and run auth flow
             self.creds = self.run_auth_flow()
+
+            # Delete credential json file
+            delete_file(file_path=self.auth_credential_json)
 
     def run_auth_flow(self):
         flow = InstalledAppFlow.from_client_secrets_file(
