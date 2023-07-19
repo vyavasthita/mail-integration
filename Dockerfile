@@ -8,7 +8,7 @@ COPY pyproject.toml /tmp
 COPY poetry.lock /tmp
 
 
-RUN poetry export -f requirements.txt --only core --output requirements.txt --without-hashes
+RUN poetry export -f requirements.txt --only core --only test --output requirements.txt --without-hashes
 
 FROM python:3.10-alpine3.18
 
@@ -39,6 +39,11 @@ COPY ./src /app/src
 COPY ./utils /app/utils
 COPY entrypoint.sh .
 COPY main.py .
+
+# Copy files for unit tests
+COPY ./tests /app/tests
+COPY .coveragerc .
+COPY pytest.ini .
 
 RUN chmod +x ./entrypoint.sh
 
