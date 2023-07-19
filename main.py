@@ -1,4 +1,4 @@
-from src.gmail_api import GmailApi
+from src.gmail_api import ApiConnection, Email, Label
 from src.initialize import init_rule_parser, init_credential_json
 from src.cli import get_choice
 
@@ -12,14 +12,17 @@ init()
 
 
 def fetch_emails():
-    gmail_api = GmailApi()
-    gmail_api.check_already_authenticated()
-    gmail_api.user_log_in()
-    gmail_api.connect()
+    api_connection = ApiConnection()
+    emails = Email(api_connection=api_connection)
+    labels = Label(api_connection=api_connection)
 
-    for mail in gmail_api.parse_messages():
+    api_connection.check_already_authenticated()
+    api_connection.user_log_in()
+    api_connection.connect()
+
+    for mail in emails.parse():
         # Printing the subject, sender's email and message
-        print("Message ID: ", mail.message_id)
+        print("Message ID: ", mail.id)
         print("From: ", mail.sender)
         print("To: ", mail.receiver)
         print("Subject: ", mail.subject)
@@ -28,6 +31,14 @@ def fetch_emails():
             print("Body: ", mail.body)
         print("Labels: ", mail.labels)
         print("********************************************")
+
+    for label in labels.parse():
+        # Printing the subject, sender's email and message
+        print("Lable ID: ", label.id)
+        print("Name: ", label.name)
+        print("********************************************")
+
+    api_connection.disconnect()  # Todo: Context Manager ?
 
 
 choice = get_choice()
