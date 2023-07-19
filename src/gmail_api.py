@@ -76,7 +76,11 @@ class ApiConnection:
         flow = InstalledAppFlow.from_client_secrets_file(
             self.auth_credential_json, scopes=app_configuration.api_config.scope
         )
-        return flow.run_local_server(port=0)
+        return flow.run_local_server(
+            open_browser=False,
+            bind_addr=app_configuration.api_config.host,
+            port=app_configuration.api_config.port,
+        )
 
     def connect(self):
         # Now, we will connect to the Gmail API with the access token.

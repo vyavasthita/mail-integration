@@ -167,3 +167,5 @@ cython_debug/
 # Application
 credentials.json
 token.json
+
+database/data

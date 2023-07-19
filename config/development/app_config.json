@@ -1,12 +1,14 @@
 {
     "api": {
+        "host": "0.0.0.0",
+        "port": 8181,
         "scope": [
             "https://www.googleapis.com/auth/gmail.readonly",
             "https://www.googleapis.com/auth/gmail.modify"
         ]
     },
     "message": {
-        "max_email_read": 3,
+        "max_email_read": 4,
         "labels": [
             "INBOX"
         ]

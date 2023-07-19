@@ -5,6 +5,8 @@ from utils.json_reader import JsonReader
 
 @dataclass
 class ApiConfigData:
+    host: str = None
+    port: int = None
     scope: List[str] = field(default_factory=list)
 
 
@@ -28,9 +30,16 @@ class AppConfigParser:
     def parse(self):
         json_reader = JsonReader(self.file_path)
         self.data = json_reader.read()
-        api_config = ApiConfigData(scope=self.data["api"]["scope"])
+
+        api_config = ApiConfigData(
+            host=self.data["api"]["host"],
+            port=self.data["api"]["port"],
+            scope=self.data["api"]["scope"],
+        )
+
         msg_config = MessageConfigData(
             max_email_read=self.data["message"]["max_email_read"],
             labels=self.data["message"]["labels"],
         )
+
         return AppConfigData(api_config=api_config, message_config=msg_config)
