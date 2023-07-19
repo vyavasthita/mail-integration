@@ -10,6 +10,9 @@ packages = [{include = "mail_integration"}]
 python = "^3.10"
 
 
+[tool.poetry.group.core.dependencies]
+python-dotenv = "^1.0.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
