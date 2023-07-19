@@ -12,6 +12,11 @@ python = "^3.10"
 
 [tool.poetry.group.core.dependencies]
 python-dotenv = "^1.0.0"
+google-api-python-client = "^2.94.0"
+google-auth-httplib2 = "^0.1.0"
+google-auth-oauthlib = "^1.0.0"
+beautifulsoup4 = "^4.12.2"
+lxml = "^4.9.3"
 
 [build-system]
 requires = ["poetry-core"]
