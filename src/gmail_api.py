@@ -21,14 +21,9 @@ class MailField:
     receiver: str = None
     subject: str = None
     date: str = None
+    snippet: str = None
     body: str = None
     labels: List[str] = field(default_factory=list)
-
-
-@dataclass
-class LabelField:
-    id: str = None
-    name: str = None
 
 
 @dataclass
@@ -96,7 +91,6 @@ class ApiConnection:
 @dataclass
 class Email:
     api_connection: ApiConnection = field(default_factory=ApiConnection)
-    mails: List[MailField] = field(default_factory=list)
 
     def parse_msg_attributes(self, headers: dict, mail_field: MailField):
         # payload dictionary contains ‘headers‘, ‘parts‘, ‘filename‘ etc.
@@ -126,15 +120,16 @@ class Email:
             soup = BeautifulSoup(decoded_data, "lxml")
             mail_field.body = soup.body()
 
-    def get_detail(self, message):
-        mail_field = MailField()
+            if mail_field.body is None:
+                mail_field.body = mail_field.snippet
 
+    def get_detail(self, message, mail_field: MailField):
         try:
             # Get the message from its id
             email_data = (
                 self.api_connection.service.users()
                 .messages()
-                .get(userId=env_configuration.USER_ID, id=message["id"])
+                .get(userId=env_configuration.USER_ID, id=message["id"], format="full")
                 .execute()
             )
 
@@ -152,12 +147,12 @@ class Email:
 
             mail_field.id = message["id"]
 
+            mail_field.snippet = email_data["snippet"]
+
             self.parse_msg_attributes(headers=headers, mail_field=mail_field)
 
             if payload.get("parts"):
                 self.parse_body(parts=payload.get("parts")[0], mail_field=mail_field)
-
-            self.mails.append(mail_field)
 
         except HttpError as error:
             print(f"Error occurred while parsing email message. {str(error)}")
@@ -193,7 +188,7 @@ class Email:
                 )
             )
 
-    def parse(self):
+    def parse(self, db_data: dict):
         # messages is a list of dictionaries where each dictionary contains a message id
         messages = self.fetch()
 
@@ -202,23 +197,22 @@ class Email:
             return
 
         for message in messages:
-            self.get_detail(message=message)
+            mail_field = MailField()
 
-        return self.mails
+            self.get_detail(message=message, mail_field=mail_field)
+
+            db_data["receiver"].append((mail_field.receiver,))
+            db_data["message"].append(
+                (mail_field.id, mail_field.snippet, mail_field.receiver)
+            )
+            db_data["sender"].append((mail_field.sender, mail_field.id))
+            db_data["subject"].append((mail_field.subject, mail_field.id))
+            db_data["date_info"].append((mail_field.date, mail_field.id))
 
 
 @dataclass
 class Label:
     api_connection: ApiConnection = field(default_factory=ApiConnection)
-    labels: List[LabelField] = field(default_factory=list)
-
-    def get_label_detail(self, label, label_field: LabelField):
-        try:
-            label_field.id = label["id"]
-            label_field.name = label["name"]
-
-        except HttpError as error:
-            print(f"Error occurred while parsing email message. {str(error)}")
 
     def fetch_labels(self):
         try:
@@ -236,7 +230,7 @@ class Label:
                 )
             )
 
-    def parse(self):
+    def parse(self, label_data: list):
         # labels is a list of dictionaries where each dictionary contains a label id
         labels = self.fetch_labels()
 
@@ -245,9 +239,4 @@ class Label:
             return
 
         for label in labels:
-            label_field = LabelField()
-
-            self.get_label_detail(label=label, label_field=label_field)
-            self.labels.append(label_field)
-
-        return self.labels
+            label_data.append((label["id"], label["name"]))

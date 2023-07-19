@@ -1,7 +1,7 @@
 from src.gmail_api import ApiConnection, Email, Label
 from src.initialize import init_rule_parser, init_credential_json
 from src.cli import get_choice
-from src.db_init import DBConnection
+from src.db_dao import EmailFetchDao
 
 
 def init():
@@ -10,12 +10,6 @@ def init():
 
 
 init()
-
-# Connect to DB
-with DBConnection() as connection:
-    connection.cursor.execute("SELECT VERSION()")
-    row = connection.cursor.fetchone()
-    print("server version:", row[0])
 
 
 def fetch_emails():
@@ -27,25 +21,23 @@ def fetch_emails():
     api_connection.user_log_in()
     api_connection.connect()
 
-    for mail in emails.parse():
-        # Printing the subject, sender's email and message
-        print("Message ID: ", mail.id)
-        print("From: ", mail.sender)
-        print("To: ", mail.receiver)
-        print("Subject: ", mail.subject)
-        print("Date: ", mail.date)
-        if mail.body:
-            print("Body: ", mail.body)
-        print("Labels: ", mail.labels)
-        print("********************************************")
+    db_data = dict()
+    db_data["receiver"] = list()
+    db_data["message"] = list()
+    db_data["sender"] = list()
+    db_data["subject"] = list()
+    db_data["date_info"] = list()
 
-    for label in labels.parse():
-        # Printing the subject, sender's email and message
-        print("Lable ID: ", label.id)
-        print("Name: ", label.name)
-        print("********************************************")
+    emails.parse(db_data=db_data)
+
+    label_data = list()
+    labels.parse(label_data)  # pass by object reference
 
     api_connection.disconnect()  # Todo: Context Manager ?
+
+    db_data["label"] = label_data
+
+    EmailFetchDao.add_emails(db_data=db_data)
 
 
 choice = get_choice()

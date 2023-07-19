@@ -17,6 +17,7 @@ class DBConnection:
             self.connection = connect(**config)
             self.cursor = self.connection.cursor()
         except Error as err:
+            self.connection.rollback()  # rollback changes
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
