@@ -41,8 +41,6 @@ class DevelopmentConfig:
     SCOPES_DEV = os.getenv("SCOPES_DEV")
     SCOPES = SCOPES_DEV.split(", ")
 
-    MAX_EMAIL_READ = ast.literal_eval(os.getenv("MAX_EMAIL_READ_DEV"))  # String to int
-
     USER_ID = os.getenv("USER_ID_DEV")
 
 

@@ -11,7 +11,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build, Resource
 from googleapiclient.errors import HttpError
 from utils.file_helper import write_to_file, delete_file
-from src import env_configuration
+from src import env_configuration, app_configuration
 
 
 @dataclass
@@ -165,7 +165,7 @@ class GmailApi:
                 .messages()
                 .list(
                     userId=env_configuration.USER_ID,
-                    maxResults=env_configuration.MAX_EMAIL_READ,
+                    maxResults=app_configuration.max_email_read,
                 )
                 .execute()
             )
