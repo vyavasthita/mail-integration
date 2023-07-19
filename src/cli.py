@@ -1,15 +1,31 @@
 import argparse
-from rule_parser import JsonRuleParser
+from dataclasses import dataclass
 
 
-parser = argparse.ArgumentParser(description="List the rules for gmail api")
+parser = argparse.ArgumentParser(
+    description="List the rules for gmail api",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+)
+
+# parser.add_argument("-r", "--rules", action="store_true")
+parser.add_argument(
+    "--emails", default=False, action="store_true", help="To fetch emails from Gmail"
+)
 
 
-parser.add_argument("-r", "--rules", action="store_true")
+@dataclass
+class Choice:
+    emails: bool = False
 
-args = parser.parse_args()
 
-parser = JsonRuleParser()
+def get_choice() -> Choice:
+    choice = Choice()
+
+    args = parser.parse_args()
+
+    choice.emails = args.emails
+
+    return choice
 
 
 def get_rule():
