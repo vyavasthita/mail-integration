@@ -1,6 +1,7 @@
 from src.gmail_api import ApiConnection, Email, Label
 from src.initialize import init_rule_parser, init_credential_json
 from src.cli import get_choice
+from src.db_init import DBConnection
 
 
 def init():
@@ -9,6 +10,12 @@ def init():
 
 
 init()
+
+# Connect to DB
+with DBConnection() as connection:
+    connection.cursor.execute("SELECT VERSION()")
+    row = connection.cursor.fetchone()
+    print("server version:", row[0])
 
 
 def fetch_emails():

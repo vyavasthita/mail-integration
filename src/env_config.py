@@ -42,6 +42,12 @@ class DevelopmentConfig:
     SCOPES = SCOPES_DEV.split(", ")
 
     USER_ID = os.getenv("USER_ID_DEV")
+    
+    MYSQL_HOST = os.getenv("MYSQL_HOST_DEV")
+    MYSQL_USER = os.getenv("MYSQL_USER_DEV")
+    MYSQL_DB = os.getenv("MYSQL_DB_DEV")
+    USER_ID = os.getenv("USER_ID_DEV")
+    MYSQL_PORT = os.getenv("MYSQL_PORT_DEV")
 
 
 class AutomatedTestingConfig:
