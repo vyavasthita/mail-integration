@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "mail-integration"
+version = "1.0.0"
+description = "Python scripts that integrates with Gmail API and performs some rule based operations on emails"
+authors = ["Dilip Kumar Sharma <diliplakshya@gmail.com>"]
+readme = "README.md"
+packages = [{include = "mail_integration"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
