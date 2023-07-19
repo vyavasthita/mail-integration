@@ -49,6 +49,15 @@ class DevelopmentConfig:
     USER_ID = os.getenv("USER_ID_DEV")
     MYSQL_PORT = os.getenv("MYSQL_PORT_DEV")
 
+    # Configuration file for logging
+    LOG_CONFIG_FILE = "./config/development/logging.conf"
+
+    # Directory where logs will be generated.
+    LOGS_DIR = os.getenv("LOGS_DIR_DEV") or "/tmp/mail_api_logs"
+
+    # Log File name
+    LOG_FILE_NAME = os.getenv("LOG_FILE_NAME_DEV") or "mail_api.log"
+
 
 class AutomatedTestingConfig:
     pass

@@ -2,6 +2,8 @@ from src.gmail_api import ApiConnection, Email, Label
 from src.initialize import init_rule_parser, init_credential_json
 from src.cli import get_choice
 from src.db_dao import EmailFetchDao
+from src import create_log_directory
+from utils.api_logger import ApiLogger
 
 
 def init():
@@ -9,6 +11,10 @@ def init():
     init_credential_json()
 
 
+create_log_directory()
+
+
+ApiLogger.log_info(f"Initializing.")
 init()
 
 
