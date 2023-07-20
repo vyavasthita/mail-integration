@@ -67,6 +67,71 @@
                 "action": {
                     "name": "Mark as read"
                 }
+            }
+        ]
+    },
+    {
+        "rule": "rule_2",
+        "predicate": "any",
+        "conditions": [
+            {
+                "field": "From",
+                "predicate": {
+                    "type": "str",
+                    "name": "contains",
+                    "value": "tenmiles.com"
+                }
+            },
+            {
+                "field": "To",
+                "predicate": {
+                    "type": "str",
+                    "name": "Equals",
+                    "value": "www.amazon.com"
+                }
+            },
+            {
+                "field": "Subject",
+                "predicate": {
+                    "type": "str",
+                    "name": "Does not contain",
+                    "value": "Interview"
+                }
+            },
+            {
+                "field": "Message",
+                "predicate": {
+                    "type": "str",
+                    "name": "Does not equal",
+                    "value": "Scheduled"
+                }
+            },
+            {
+                "field": "Date Received",
+                "predicate": {
+                    "type": "date",
+                    "name": "is less than",
+                    "duration": "months",
+                    "value": 1
+                }
+            },
+            {
+                "field": "Date Received",
+                "predicate": {
+                    "type": "date",
+                    "name": "less than",
+                    "duration": "days",
+                    "value": 11
+                }
+            }
+        ],
+        "actions": [
+            {
+                "type": "Move",
+                "action": {
+                    "name": "Move Message",
+                    "to mailbox": "Inbox"
+                }
             },
             {
                 "type": "Unread",

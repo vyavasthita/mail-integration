@@ -31,8 +31,14 @@ def read_arguments(available_rules: list):
         action="store_true",
         help="To fetch emails from Gmail",
     )
+
     group.add_argument(
-        "-s", "--showrules", action="store_true", help="To show all the available rules"
+        "-s",
+        "--showrules",
+        choices=available_rules + ["all"],
+        help="Show all the available rules. Select all for all rules or select a particular rule",
+        nargs=1,
+        type=str,
     )
 
     group.add_argument(
@@ -55,6 +61,7 @@ def get_choice(available_rules: list) -> Choice:
         choice.option = ArgOption.FETCH_EMAIL
     elif args.showrules:
         choice.option = ArgOption.SHOW_RULES
+        choice.rule = args.showrules[0]
     else:
         choice.option = ArgOption.APPLY_RULES
         choice.rule = args.applyrule[0]

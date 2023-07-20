@@ -1,3 +1,4 @@
+import json
 from src.gmail_api import ApiConnection, Email, Label
 from src.initialize import init_rule_parser, init_credential_json
 from src.cli import ArgOption, get_choice
@@ -66,8 +67,16 @@ def read_emails():
     create_ftsi()
 
 
-def show_rules():
-    ApiLogger.log_info("Show rules.")
+def show_rules(rule: str):
+    ApiLogger.log_info(f"Show rule {rule}.")
+
+    if rule == "all":
+        print(json.dumps(rules_data, indent=1))
+    else:
+        for rule_data in rules_data:
+            if rule_data.get("rule"):
+                print(json.dumps(rule_data, indent=1))
+                break
 
 
 def apply_rule(rule: str):
@@ -79,6 +88,6 @@ choice = get_choice(get_available_rules())
 if choice.option == ArgOption.FETCH_EMAIL:
     read_emails()
 elif choice.option == ArgOption.SHOW_RULES:
-    show_rules()
+    show_rules(choice.rule)
 else:
     apply_rule(choice.rule)
