@@ -1,4 +1,6 @@
+from mysql.connector import Error, errorcode, Warning
 from src.db_init import DBConnection
+from utils.api_logger import ApiLogger
 
 
 class EmailFetchDao:
@@ -53,4 +55,9 @@ class SPDao:
     @staticmethod
     def call_sp(name: str):
         with DBConnection() as db_connection:
-            db_connection.cursor.callproc(name)
+            try:
+                db_connection.cursor.callproc(name)
+            except Warning as warning:
+                ApiLogger.log_info(warning)
+            except Error as error:
+                ApiLogger.log_info(error.errno, error.msg)
