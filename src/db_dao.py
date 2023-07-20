@@ -44,6 +44,13 @@ class EmailFetchDao:
             # db_connection.cursor.executemany(add_email_label, db_data["email_label"])
             db_connection.cursor.executemany(add_sender, db_data["sender"])
             db_connection.cursor.executemany(add_receiver, db_data["receiver"])
-            db_connection.cursor.executemany(add_content, db_data["content"])
+            # db_connection.cursor.executemany(add_content, db_data["content"])
             db_connection.cursor.executemany(add_date, db_data["date"])
             db_connection.connection.commit()  # commit changes
+
+
+class SPDao:
+    @staticmethod
+    def call_sp(name: str):
+        with DBConnection() as db_connection:
+            db_connection.cursor.callproc(name)

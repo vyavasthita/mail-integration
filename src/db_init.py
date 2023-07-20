@@ -1,11 +1,11 @@
 from mysql.connector import connect, Error, errorcode
 from src import env_configuration
 
-
 config = {
-    "user": env_configuration.MYSQL_USER,
     "host": env_configuration.MYSQL_HOST,
     "database": env_configuration.MYSQL_DB,
+    "user": env_configuration.MYSQL_USER,
+    "password": env_configuration.MYSQL_PASSWORD,
     "raise_on_warnings": True,
     "autocommit": True,
 }
@@ -16,14 +16,15 @@ class DBConnection:
         try:
             self.connection = connect(**config)
             self.cursor = self.connection.cursor()
-        except Error as err:
-            self.connection.rollback()  # rollback changes
-            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+        except Error as error:
+            if error.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
-            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            elif error.errno == errorcode.ER_BAD_DB_ERROR:
                 print("Database does not exist")
             else:
-                print(err)
+                print(str(error))
+        except Exception as error:
+            print(str(error))
 
     def __enter__(self):
         return self

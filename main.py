@@ -1,7 +1,7 @@
 from src.gmail_api import ApiConnection, Email, Label
 from src.initialize import init_rule_parser, init_credential_json
 from src.cli import get_choice
-from src.db_dao import EmailFetchDao
+from src.db_dao import EmailFetchDao, SPDao
 from src import create_log_directory
 from utils.api_logger import ApiLogger
 
@@ -54,7 +54,13 @@ def fetch_emails():
     EmailFetchDao.add_emails(db_data=db_data)
 
 
+def create_ftsi():
+    ApiLogger.log_info("Creating full text search indexes.")
+    SPDao.call_sp("create_fti")
+
+
 choice = get_choice()
 
 if choice.emails:
     fetch_emails()
+    create_ftsi()
