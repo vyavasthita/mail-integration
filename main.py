@@ -1,21 +1,22 @@
 from src.gmail_api import ApiConnection, Email, Label
 from src.initialize import init_rule_parser, init_credential_json
-from src.cli import get_choice
+from src.cli import ArgOption, get_choice
 from src.db_dao import EmailFetchDao, SPDao
 from src import create_log_directory
 from utils.api_logger import ApiLogger
 
 
-def init():
-    print("Creating log directory")
-    create_log_directory()
+print("Creating log directory")
+create_log_directory()
 
-    ApiLogger.log_debug("Initializing.")
-    init_credential_json()
-    init_rule_parser()
+ApiLogger.log_debug("Initializing credential json.")
+init_credential_json()
+
+rules_data = init_rule_parser()
 
 
-init()
+def get_available_rules():
+    return [rule_data["rule"] for rule_data in rules_data]
 
 
 def fetch_emails():
@@ -59,8 +60,25 @@ def create_ftsi():
     SPDao.call_sp("create_fti")
 
 
-choice = get_choice()
-
-if choice.emails:
+def read_emails():
+    ApiLogger.log_info("Fetch emails.")
     fetch_emails()
     create_ftsi()
+
+
+def show_rules():
+    ApiLogger.log_info("Show rules.")
+
+
+def apply_rule(rule: str):
+    ApiLogger.log_info(f"Applying rule {rule}.")
+
+
+choice = get_choice(get_available_rules())
+
+if choice.option == ArgOption.FETCH_EMAIL:
+    read_emails()
+elif choice.option == ArgOption.SHOW_RULES:
+    show_rules()
+else:
+    apply_rule(choice.rule)
