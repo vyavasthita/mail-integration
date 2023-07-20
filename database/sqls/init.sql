@@ -88,25 +88,39 @@ DROP PROCEDURE IF EXISTS create_fti;
 DELIMITER $$
 CREATE DEFINER='local'@'localhost' PROCEDURE IF NOT EXISTS create_fti()
 BEGIN
-    IF check_index_exists('email_sender', 'sender') THEN
+	DECLARE is_found INTEGER;
+
+    -- Check index 'sender' exists for table 'email_sender'
+    SELECT check_index_exists('email_sender', 'sender') INTO is_found;
+
+    IF is_found = 0 THEN
         ALTER TABLE email_sender ADD FULLTEXT(sender);
     ELSE
         SELECT CONCAT('Index ','sender ','already exists on Table ', 'mails','.','email_sender');   
     END IF;
 
-    IF check_index_exists('email_receiver', 'receiver') THEN
+    -- Check index 'receiver' exists for table 'email_receiver'
+    SELECT check_index_exists('email_receiver', 'receiver') INTO is_found;
+
+    IF is_found = 0 THEN
          ALTER TABLE email_receiver ADD FULLTEXT(receiver);
     ELSE
         SELECT CONCAT('Index ','receiver ','already exists on Table ', 'mails','.','email_receiver');   
     END IF;
 
-    IF check_index_exists('email_subject', 'subject') THEN
+    -- Check index 'subject' exists for table 'email_subject'
+    SELECT check_index_exists('email_subject', 'subject') INTO is_found;
+
+    IF is_found = 0 THEN
         ALTER TABLE email_subject ADD FULLTEXT(subject);
     ELSE
         SELECT CONCAT('Index ','subject ','already exists on Table ', 'mails','.','email_subject');   
     END IF;
 
-    IF check_index_exists('email_content', 'content') THEN
+    -- Check index 'content' exists for table 'email_content'
+    SELECT check_index_exists('email_content', 'content') INTO is_found;
+
+    IF is_found = 0 THEN
         ALTER TABLE email_content ADD FULLTEXT(content);
     ELSE
         SELECT CONCAT('Index ','content ','already exists on Table ', 'mails','.','email_content');   
