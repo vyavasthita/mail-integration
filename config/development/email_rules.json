@@ -5,40 +5,50 @@
         "conditions": [
             {
                 "field": "From",
+                "code": 1,
                 "predicate": {
                     "type": "str",
+                    "code": 1,
                     "name": "contains",
                     "value": "tenmiles.com"
                 }
             },
             {
                 "field": "To",
+                "code": 2,
                 "predicate": {
                     "type": "str",
+                    "code": 2,
                     "name": "Does not contain",
                     "value": "www.amazon.com"
                 }
             },
             {
                 "field": "Subject",
+                "code": 3,
                 "predicate": {
                     "type": "str",
+                    "code": 3,
                     "name": "Equals",
                     "value": "Interview"
                 }
             },
             {
                 "field": "Message",
+                "code": 4,
                 "predicate": {
                     "type": "str",
+                    "code": 4,
                     "name": "Does not equal",
                     "value": "Scheduled"
                 }
             },
             {
                 "field": "Date Received",
+                "code": 5,
                 "predicate": {
                     "type": "date",
+                    "code": 5,
                     "name": "is less than",
                     "duration": "days",
                     "value": 2
@@ -46,9 +56,11 @@
             },
             {
                 "field": "Date Received",
+                "code": 5,
                 "predicate": {
                     "type": "date",
-                    "name": "less than",
+                    "code": 6,
+                    "name": "is greator than",
                     "duration": "months",
                     "value": 1
                 }
@@ -76,40 +88,50 @@
         "conditions": [
             {
                 "field": "From",
+                "code": 1,
                 "predicate": {
                     "type": "str",
+                    "code": 1,
                     "name": "contains",
                     "value": "tenmiles.com"
                 }
             },
             {
                 "field": "To",
+                "code": 2,
                 "predicate": {
                     "type": "str",
+                    "code": 3,
                     "name": "Equals",
                     "value": "www.amazon.com"
                 }
             },
             {
                 "field": "Subject",
+                "code": 3,
                 "predicate": {
                     "type": "str",
+                    "code": 2,
                     "name": "Does not contain",
                     "value": "Interview"
                 }
             },
             {
                 "field": "Message",
+                "code": 4,
                 "predicate": {
                     "type": "str",
+                    "code": 4,
                     "name": "Does not equal",
                     "value": "Scheduled"
                 }
             },
             {
                 "field": "Date Received",
+                "code": 5,
                 "predicate": {
                     "type": "date",
+                    "code": 5,
                     "name": "is less than",
                     "duration": "months",
                     "value": 1
@@ -117,9 +139,11 @@
             },
             {
                 "field": "Date Received",
+                "code": 5,
                 "predicate": {
                     "type": "date",
-                    "name": "less than",
+                    "code": 6,
+                    "name": "is greator than",
                     "duration": "days",
                     "value": 11
                 }

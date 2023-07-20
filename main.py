@@ -4,6 +4,7 @@ from src.initialize import init_rule_parser, init_credential_json
 from src.cli import ArgOption, get_choice
 from src.db_dao import EmailFetchDao, SPDao
 from src import create_log_directory
+from src.query_builder import QueryBuilder
 from utils.api_logger import ApiLogger
 
 
@@ -18,6 +19,12 @@ rules_data = init_rule_parser()
 
 def get_available_rules():
     return [rule_data["rule"] for rule_data in rules_data]
+
+
+def get_rule(rule: str):
+    for rule_data in rules_data:
+        if rule_data.get("rule") == rule:
+            return rule_data
 
 
 def fetch_emails():
@@ -73,14 +80,16 @@ def show_rules(rule: str):
     if rule == "all":
         print(json.dumps(rules_data, indent=1))
     else:
-        for rule_data in rules_data:
-            if rule_data.get("rule"):
-                print(json.dumps(rule_data, indent=1))
-                break
+        rule_data = get_rule(rule)
+        print(json.dumps(rule_data, indent=1))
 
 
 def apply_rule(rule: str):
     ApiLogger.log_info(f"Applying rule {rule}.")
+
+    rule_data = get_rule(rule)
+    query_builer = QueryBuilder(rule_data)
+    query_builer.build()
 
 
 choice = get_choice(get_available_rules())
