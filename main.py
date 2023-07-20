@@ -7,20 +7,22 @@ from utils.api_logger import ApiLogger
 
 
 def init():
-    init_rule_parser()
+    print("Creating log directory")
+    create_log_directory()
+
+    ApiLogger.log_debug("Initializing.")
     init_credential_json()
+    init_rule_parser()
 
 
-create_log_directory()
-
-
-ApiLogger.log_info(f"Initializing.")
 init()
 
 
 def fetch_emails():
     api_connection = ApiConnection()
+
     emails = Email(api_connection=api_connection)
+
     labels = Label(api_connection=api_connection)
 
     api_connection.check_already_authenticated()
@@ -28,15 +30,21 @@ def fetch_emails():
     api_connection.connect()
 
     db_data = dict()
-    db_data["receiver"] = list()
-    db_data["message"] = list()
-    db_data["sender"] = list()
-    db_data["subject"] = list()
-    db_data["date_info"] = list()
 
+    db_data["email"] = list()
+    # db_data["email_label"] = list()
+    db_data["sender"] = list()
+    db_data["receiver"] = list()
+    db_data["subject"] = list()
+    db_data["content"] = list()
+    db_data["date"] = list()
+
+    ApiLogger.log_debug("Fetching emails.")
     emails.parse(db_data=db_data)
 
     label_data = list()
+
+    ApiLogger.log_debug("Fetching labels.")
     labels.parse(label_data)  # pass by object reference
 
     api_connection.disconnect()  # Todo: Context Manager ?

@@ -10,8 +10,13 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build, Resource
 from googleapiclient.errors import HttpError
-from utils.file_helper import write_to_file, delete_file
 from src import env_configuration, app_configuration
+from utils.file_helper import write_to_file, delete_file
+from utils.api_logger import ApiLogger
+from utils.datetime_helper import (
+    find_datetime_from_strftime,
+    change_format_from_datetime,
+)
 
 
 @dataclass
@@ -40,15 +45,20 @@ class ApiConnection:
     service: Resource = None
 
     def check_already_authenticated(self):
+        ApiLogger.log_info("Checking if user is already authenticated.")
+
         # If scopes is modified, we should delete the file token.json
         if os.path.exists(self.token_json):
+            ApiLogger.log_debug("Token file is present.")
             self.creds = Credentials.from_authorized_user_file(
                 "token.json", scopes=app_configuration.api_config.scope
             )
 
     def user_log_in(self):
+        ApiLogger.log_info("Checking if user login is required.")
         # We check whether or not token json is present
         if not self.creds or not self.creds.valid:
+            ApiLogger.log_info("Token does not exist or invalid.")
             # If token does not exist or is invalid, our program will open up
             # the browser and ask for access to the User’s Gmail
             # and save it for next time.
@@ -59,11 +69,16 @@ class ApiConnection:
     def get_token(self):
         # token needs to be refreshed
         if self.creds and self.creds.expired and self.creds.refresh_token:
+            ApiLogger.log_info(
+                "Token expired and refresh token is present. Get token from refresh token."
+            )
             self.creds.refresh(Request())
         else:
+            ApiLogger.log_info("Run the auth flow using browser.")
             # Open the browser and run auth flow
             self.creds = self.run_auth_flow()
 
+            ApiLogger.log_debug("Post auth flow, delete the credential json file.")
             # Delete credential json file
             delete_file(file_path=self.auth_credential_json)
 
@@ -78,13 +93,15 @@ class ApiConnection:
         )
 
     def connect(self):
+        ApiLogger.log_info("Connect to Gmail API with access token.")
         # Now, we will connect to the Gmail API with the access token.
         try:
             self.service = build("gmail", "v1", credentials=self.creds)
         except HttpError as error:
-            print(f"Failed to connect. {str(error)}")
+            ApiLogger.log_error(f"Failed to connect to Gmail API. {str(error)}")
 
     def disconnect(self):
+        ApiLogger.log_info("Disconnect from Gmail API.")
         self.service.close()
 
 
@@ -106,7 +123,11 @@ class Email:
                 mail_field.subject = header["value"]
 
             if header["name"] == "Date":
-                mail_field.date = header["value"]
+                # find the datetime format
+                dt = find_datetime_from_strftime(header["value"])
+                mail_field.date = change_format_from_datetime(
+                    dt=dt, new_format="%Y-%m-%d"
+                )
 
     def parse_body(self, parts, mail_field: MailField):
         # Get the data and decode it with base 64 decoder.
@@ -119,9 +140,6 @@ class Email:
             # it with BeautifulSoup library
             soup = BeautifulSoup(decoded_data, "lxml")
             mail_field.body = soup.body()
-
-            if mail_field.body is None:
-                mail_field.body = mail_field.snippet
 
     def get_detail(self, message, mail_field: MailField):
         try:
@@ -201,14 +219,22 @@ class Email:
 
             self.get_detail(message=message, mail_field=mail_field)
 
-            db_data["receiver"].append((mail_field.receiver,))
-            db_data["message"].append(
-                (mail_field.id, mail_field.snippet, mail_field.receiver)
-            )
-            db_data["sender"].append((mail_field.sender, mail_field.id))
-            db_data["subject"].append((mail_field.subject, mail_field.id))
-            db_data["date_info"].append((mail_field.date, mail_field.id))
+            # Check if email is marked read by reading UNREAD label
 
+            is_read = False
+
+            if "UNREAD" not in mail_field.labels:
+                is_read = True
+
+            db_data["email"].append((mail_field.id, is_read))
+            # db_data["email_label"].append((mail_field.id, is_read))
+            db_data["sender"].append((mail_field.id, mail_field.sender))
+            db_data["receiver"].append((mail_field.id, mail_field.receiver))
+            db_data["subject"].append((mail_field.id, mail_field.subject))
+
+            if mail_field.date:  # To Do: Why date is None ?
+                db_data["content"].append((mail_field.id, mail_field.body))
+            db_data["date"].append((mail_field.id, mail_field.date))
 
 @dataclass
 class Label:

@@ -1,4 +1,9 @@
+from utils.api_logger import ApiLogger
+
+
 def gen_data(env_configuration):
+    ApiLogger.log_debug("Creating credential json data from environment variables.")
+
     data = dict()
 
     installed_data = dict()
