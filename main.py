@@ -1,10 +1,11 @@
 import json
 from src.gmail_api import ApiConnection, Email, Label
-from src.initialize import init_rule_parser, init_credential_json
+from src.initialize import init_credential_json
 from src.cli import ArgOption, get_choice
 from src.db_dao import EmailFetchDao, SPDao
 from src import create_log_directory
-from src.query_builder import QueryBuilder
+from src.rule_engine import RuleEngine
+from src.rule_data import RuleData
 from utils.api_logger import ApiLogger
 
 
@@ -14,17 +15,8 @@ create_log_directory()
 ApiLogger.log_debug("Initializing credential json.")
 init_credential_json()
 
-rules_data = init_rule_parser()
-
-
-def get_available_rules():
-    return [rule_data["rule"] for rule_data in rules_data]
-
-
-def get_rule(rule: str):
-    for rule_data in rules_data:
-        if rule_data.get("rule") == rule:
-            return rule_data
+rule_data = RuleData()
+rule_engine = RuleEngine()
 
 
 def fetch_emails():
@@ -78,25 +70,16 @@ def show_rules(rule: str):
     ApiLogger.log_info(f"Show rule {rule}.")
 
     if rule == "all":
-        print(json.dumps(rules_data, indent=1))
+        print(json.dumps(rule_data.get_all(), indent=1))
     else:
-        rule_data = get_rule(rule)
-        print(json.dumps(rule_data, indent=1))
+        print(json.dumps(rule_data.get_rule(rule), indent=1))
 
 
-def apply_rule(rule: str):
-    ApiLogger.log_info(f"Applying rule {rule}.")
-
-    rule_data = get_rule(rule)
-    query_builer = QueryBuilder(rule_data)
-    query_builer.build()
-
-
-choice = get_choice(get_available_rules())
+choice = get_choice(rule_data.get_available_rules())
 
 if choice.option == ArgOption.FETCH_EMAIL:
     read_emails()
 elif choice.option == ArgOption.SHOW_RULES:
     show_rules(choice.rule)
 else:
-    apply_rule(choice.rule)
+    rule_engine.apply_rule(choice.rule)
