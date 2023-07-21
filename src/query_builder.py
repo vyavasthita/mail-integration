@@ -39,9 +39,6 @@ class QueryBuilder:
         LESS_THAN = 5
         GREATOR_THAN = 6
 
-    def __init__(self, rule: dict) -> None:
-        self.rule = rule
-
     def gen_table_query_str(self, condition_code: int):
         table = str()
         column = str()
@@ -159,6 +156,8 @@ class QueryBuilder:
             + self.gen_field_query_str(column, condition)
         )
 
+
+class AllQueryBuilder(QueryBuilder):
     def get_where_conditions(self, conditions: list):
         query = str()
 
@@ -224,6 +223,8 @@ class QueryBuilder:
             + QueryBuilder.Operator.SEMICOLON
         )
 
+
+class AnyQueryBuilder(QueryBuilder):
     def build_any_predicate(self, conditions):
         cumulative_query = str()
 
@@ -243,8 +244,3 @@ class QueryBuilder:
 
         return cumulative_query
 
-    def build(self):
-        if self.rule["predicate"] == "all":
-            return self.build_all_predicate(self.rule["conditions"])
-        elif self.rule["predicate"] == "any":
-            return self.build_any_predicate(self.rule["conditions"])
