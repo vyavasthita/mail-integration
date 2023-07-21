@@ -11,7 +11,7 @@ from utils.datetime_helper import (
 
 
 class QueryBuilder:
-    class StrOperator(str, Enum):
+    class Operator(str, Enum):
         SPACE = " "
         PLUS = "+"
         MINUS = "-"
@@ -22,6 +22,7 @@ class QueryBuilder:
         NOT = "NOT"
         EQUAL = "="
         NOT_EQUAL = "!="
+        TAB = "\t"
 
     class Field(IntEnum):
         FROM = 1
@@ -42,26 +43,26 @@ class QueryBuilder:
         self.rule = rule
 
     def gen_table_query_str(self, condition_code: int):
-        table_name = str()
+        table = str()
         column = str()
 
         if condition_code == QueryBuilder.Field.FROM:
-            table_name = "email_sender"
+            table = "email_sender"
             column = "sender"
         elif condition_code == QueryBuilder.Field.TO:
-            table_name = "email_receiver"
+            table = "email_receiver"
             column = "receiver"
         elif condition_code == QueryBuilder.Field.SUBJECT:
-            table_name = "email_subject"
+            table = "email_subject"
             column = "subject"
         elif condition_code == QueryBuilder.Field.MESSAGE:
-            table_name = "email_content"
+            table = "email_content"
             column = "content"
         elif condition_code == QueryBuilder.Field.DATE_RECEIVED:
-            table_name = "email_date"
+            table = "email_date"
             column = "received"
 
-        return table_name, column
+        return table, column
 
     def gen_match_query_str(self, column: str, predicate_value: str):
         # MATCH (sender) AGAINST ('"Naukri"' IN BOOLEAN MODE)
@@ -113,22 +114,24 @@ class QueryBuilder:
             pass
         elif predicate_code == QueryBuilder.Predicate.DOES_NOT_CONTAIN:
             match_string = (
-                QueryBuilder.StrOperator.NOT.value
-                + QueryBuilder.StrOperator.SPACE.value
+                QueryBuilder.Operator.NOT.value
+                + QueryBuilder.Operator.SPACE.value
                 + match_string
             )
         elif predicate_code == QueryBuilder.Predicate.EQUALS:
             # LENGTH(subject) = LENGTH("tenmiles.com")
             match_string = (
                 match_string
-                + QueryBuilder.StrOperator.SPACE.value
+                + QueryBuilder.Operator.SPACE.value
                 + "AND"
-                + QueryBuilder.StrOperator.SPACE.value
+                + QueryBuilder.Operator.SPACE.value
                 + f"LENGTH({column}) = LENGTH('{predicate_value}')"
             )
         elif predicate_code == QueryBuilder.Predicate.DOES_NOT_EQUAL:
             # content != 'Scheduled'
-            match_string = f"{column} {QueryBuilder.StrOperator.NOT_EQUAL.value} '{predicate_value}'"
+            match_string = (
+                f"{column} {QueryBuilder.Operator.NOT_EQUAL.value} '{predicate_value}'"
+            )
 
         return match_string
 
@@ -145,20 +148,66 @@ class QueryBuilder:
 
         return self.gen_str_field_query_str(column, condition_predicate)
 
-    def build_condition_query(self, predicate: str, condition):
-        select_columns = "*" if predicate == "all" else "message_id"
-
-        table_name, column = self.gen_table_query_str(condition_code=condition["code"])
+    def build_condition_query(self, condition):
+        table, column = self.gen_table_query_str(condition_code=condition["code"])
 
         return (
-            "SELECT {} FROM {}".format(select_columns, table_name)
-            + QueryBuilder.StrOperator.SPACE
+            "SELECT message_id FROM {}".format(table)
+            + QueryBuilder.Operator.SPACE
             + "WHERE"
-            + QueryBuilder.StrOperator.SPACE
+            + QueryBuilder.Operator.SPACE
             + self.gen_field_query_str(column, condition)
         )
 
-    def build_all_predicate(self, predicate: str):
+    def get_where_conditions(self, conditions: list):
+        query = str()
+
+        for index, condition in enumerate(conditions):
+            table, column = self.gen_table_query_str(condition_code=condition["code"])
+            query += self.gen_field_query_str(column, condition)
+
+            if (
+                index != len(conditions) - 1
+            ):  # not processing last item, so add AND condition followed by a SPACE
+                query = (
+                    query
+                    + QueryBuilder.Operator.NEW_LINE
+                    + QueryBuilder.Operator.SPACE
+                    + "AND"
+                    + QueryBuilder.Operator.SPACE
+                )
+        return query
+
+    def gen_join_condition(self, conditions: list):
+        # JOIN email_receiver using (message_id)
+        # JOIN email_subject using (message_id)
+        joining_column = "message_id"
+        query = str()
+        processed_conditions = set()
+
+        for index, condition in enumerate(conditions):
+            table, column = self.gen_table_query_str(condition_code=condition["code"])
+
+            if index == 0:
+                query = (
+                    query
+                    + "SELECT message_id FROM {}".format(table)
+                    + QueryBuilder.Operator.NEW_LINE
+                )
+                continue
+
+            # If same condition is added twice, we should not add join condition twice
+            if table not in processed_conditions:
+                query = (
+                    query
+                    + f"{QueryBuilder.Operator.SPACE}JOIN {table} using ({joining_column})"
+                    + QueryBuilder.Operator.NEW_LINE
+                )
+                processed_conditions.add(table)
+
+        return query
+
+    def build_all_predicate(self, conditions: list):
         # SELECT email_sender.message_id,
         # MATCH(email_sender.sender) AGAINST('+interviews') as sender,
         # MATCH(email_receiver.receiver) AGAINST('+gmail.com') as receiver
@@ -166,140 +215,36 @@ class QueryBuilder:
         # LEFT JOIN email_receiver ON email_sender.message_id = email_receiver.message_id
         # WHERE
         # MATCH(email_sender.sender) AGAINST('+interviews');
+        return (
+            self.gen_join_condition(conditions)
+            + "WHERE"
+            + QueryBuilder.Operator.NEW_LINE
+            + QueryBuilder.Operator.SPACE
+            + self.get_where_conditions(conditions)
+            + QueryBuilder.Operator.SEMICOLON
+        )
 
+    def build_any_predicate(self, conditions):
         cumulative_query = str()
 
-        conditions = self.rule["conditions"]
-
         for index, condition in enumerate(conditions):
-            query = "SELECT {}.message_id FROM {}"
+            cumulative_query += self.build_condition_query(condition)
 
-            table_name = str()
-            column_name = str()
-
-            condition_code = condition["code"]
-            condition_predicate = condition["predicate"]
-
-            if condition_code == 1:  # FROM
-                table_name = "email_sender"
-                column_name = "sender"
-                query = query.format(table_name, table_name)
-            elif condition_code == 2:  # To
-                table_name = "email_receiver"
-                column_name = "receiver"
-                query = query + QueryBuilder.COMMA + QueryBuilder.SPACE + table_name
-            elif condition_code == 3:  # Subject
-                table_name = "email_subject"
-                column_name = "subject"
-                query = query + QueryBuilder.COMMA + QueryBuilder.SPACE + table_name
-            elif condition_code == 4:  # Message
-                table_name = "email_content"
-                column_name = "content"
-                query = query + QueryBuilder.COMMA + QueryBuilder.SPACE + table_name
-            elif condition_code == 5:  # Date Received
-                table_name = "email_date"
-                column_name = "received"
-                query = query + QueryBuilder.COMMA + QueryBuilder.SPACE + table_name
-
-            predicate_code = condition_predicate["code"]
-            predicate_value = condition_predicate["value"]
-
-            query = query + QueryBuilder.NEW_LINE + "WHERE" + QueryBuilder.NEW_LINE
-
-            if predicate_code == 1 or predicate_code == 2:
-                full_text_index_op = str()
-
-                if predicate_code == 1:  # contains
-                    full_text_index_op = QueryBuilder.PLUS
-                elif predicate_code == 2:  # Does not contain
-                    full_text_index_op = QueryBuilder.MINUS
-
-                query = (
-                    query
-                    + QueryBuilder.SPACE
-                    + "WHERE MATCH"
-                    + QueryBuilder.SPACE
-                    + f"({column_name})"
-                    + QueryBuilder.SPACE
-                    + "AGAINST"
-                    + QueryBuilder.SPACE
-                    + f"('{full_text_index_op}{predicate_value}' IN BOOLEAN MODE)"
-                )
-            elif predicate_code == 3 or predicate_code == 4:
-                equality_condition = str()
-
-                if predicate_code == 3:  # Equals
-                    equality_condition = "="
-                elif predicate_code == 4:  # Does not equal
-                    equality_condition = "!="
-
-                query = (
-                    query
-                    + QueryBuilder.SPACE
-                    + "WHERE"
-                    + QueryBuilder.SPACE
-                    + column_name
-                    + QueryBuilder.SPACE
-                    + equality_condition
-                    + QueryBuilder.SPACE
-                    + QueryBuilder.SINGLE_QUOTE
-                    + predicate_value
-                    + QueryBuilder.SINGLE_QUOTE
-                )
-            elif predicate_code == 5 or predicate_code == 6:
-                predicate_duration = condition_predicate["duration"]
-
-                if predicate_duration == "months":
-                    predicate_value *= 30
-
-                today_date = get_today()
-                start = None
-                end = None
-
-                if predicate_code == 5:  # is less than
-                    end = today_date
-                    start = subtract_days(end, predicate_value)
-                elif predicate_code == 6:  # is greator than
-                    start = today_date
-                    end = add_days(start, predicate_value)
-
-                start = change_format_from_datetime(start, "%Y-%m-%d")
-                end = change_format_from_datetime(end, "%Y-%m-%d")
-
-                query = (
-                    query
-                    + QueryBuilder.SPACE
-                    + "WHERE"
-                    + QueryBuilder.SPACE
-                    + f"({column_name} BETWEEN '{start}' AND '{end}')"
-                )
-
-        return cumulative_query
-
-    def build_any_predicate(self, predicate: str):
-        cumulative_query = str()
-
-        conditions = self.rule["conditions"]
-
-        for index, condition in enumerate(conditions):
-            cumulative_query += self.build_condition_query(predicate, condition)
-
-            if (
-                index != len(conditions) - 1
+            if index != (
+                len(conditions) - 1
             ):  # not processing last item, so add join predicate
                 cumulative_query += (
-                    QueryBuilder.StrOperator.NEW_LINE
+                    QueryBuilder.Operator.NEW_LINE
                     + "UNION"
-                    + QueryBuilder.StrOperator.NEW_LINE
+                    + QueryBuilder.Operator.NEW_LINE
                 )
 
-        cumulative_query += QueryBuilder.StrOperator.SEMICOLON
+        cumulative_query += QueryBuilder.Operator.SEMICOLON
 
         return cumulative_query
 
     def build(self):
-        predicate = self.rule["predicate"]
-        if predicate == "all":
-            return self.build_all_predicate(predicate)
-        elif predicate == "any":
-            return self.build_any_predicate(predicate)
+        if self.rule["predicate"] == "all":
+            return self.build_all_predicate(self.rule["conditions"])
+        elif self.rule["predicate"] == "any":
+            return self.build_any_predicate(self.rule["conditions"])
