@@ -1,6 +1,5 @@
-from typing import List
 from dataclasses import dataclass, field
-from src.mail_data import MailData
+from src.mail_engine.mail_data import MailData
 from src.db_dao import MailDao
 
 

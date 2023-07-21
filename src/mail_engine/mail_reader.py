@@ -1,11 +1,10 @@
 import os.path
 import base64
-from bs4 import BeautifulSoup
 from typing import List
 from dataclasses import dataclass, field
 from googleapiclient.errors import HttpError
 from src import env_configuration, app_configuration
-from src.mail_connection import GmailAuth
+from src.mail_engine.mail_connection import GmailAuth
 from utils.api_logger import ApiLogger
 from utils.datetime_helper import (
     find_datetime_from_strftime,
@@ -180,17 +179,17 @@ class MailReader:
             is_read = "UNREAD" not in mail_field.labels
 
             #
-            with open("message_data.txt", "a") as f:
-                f.write(f"Message Id: {mail_field.id}\n")
-                f.write(f"From: {mail_field.sender}\n")
-                f.write(f"To: {mail_field.receiver}\n")
-                f.write(f"Subject: {mail_field.subject}\n")
-                f.write(f"Date: {mail_field.date}\n")
-                f.write(f"Labels: {mail_field.labels}\n")
-                f.write(f"Message: {mail_field.body}\n")
-                f.write(
-                    "***********************************************************************\n"
-                )
+            # with open("message_data.txt", "a") as f:
+            #     f.write(f"Message Id: {mail_field.id}\n")
+            #     f.write(f"From: {mail_field.sender}\n")
+            #     f.write(f"To: {mail_field.receiver}\n")
+            #     f.write(f"Subject: {mail_field.subject}\n")
+            #     f.write(f"Date: {mail_field.date}\n")
+            #     f.write(f"Labels: {mail_field.labels}\n")
+            #     f.write(f"Message: {mail_field.body}\n")
+            #     f.write(
+            #         "***********************************************************************\n"
+            #     )
             #
 
             db_data["email"].append((mail_field.id, is_read))

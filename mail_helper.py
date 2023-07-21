@@ -5,9 +5,9 @@ from dataclasses import dataclass
 from src.initialize import init_credential_json
 from src.db_dao import SPDao
 from src import create_log_directory
-from src.rule_data import RuleData
-from src.mail_engine import MailEngine
-from src.rule_engine import RuleEngine
+from src.rule_engine.rule_data import RuleData
+from src.mail_engine.mail_engine import MailEngine
+from src.rule_engine.rule_engine import RuleEngine
 from utils.api_logger import ApiLogger
 
 

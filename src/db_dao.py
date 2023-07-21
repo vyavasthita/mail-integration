@@ -1,7 +1,7 @@
 from typing import List
 from mysql.connector import Error, errorcode, Warning
 from src.db_init import DBConnection
-from src.mail_data import MailData
+from src.mail_engine.mail_data import MailData
 from utils.api_logger import ApiLogger
 
 

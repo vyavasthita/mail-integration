@@ -1,9 +1,6 @@
-from typing import List
-from dataclasses import dataclass, field
-from src.mail_connection import GmailConnection
-from src.mail_reader import MailReader, LabelReader
-from src.mail_data import MailData
-from src.mail_data_builder import MailDataBuilder
+from src.mail_engine.mail_connection import GmailConnection
+from src.mail_engine.mail_reader import MailReader, LabelReader
+from src.mail_engine.mail_data_builder import MailDataBuilder
 from utils.api_logger import ApiLogger
 
 
@@ -14,10 +11,6 @@ class MailEngine:
 
         self.mail_data = list()
         self.mail_data_builder = MailDataBuilder(self.mail_data, self.data)
-
-    # data: dict = field(default_factory=dict)
-    # mail_data: list[MailData]# = field(default_factory=list)
-    # mail_data_builder: MailDataBuilder = MailDataBuilder(mail_data, data)
 
     def init_data(self):
         self.data["email"] = list()
