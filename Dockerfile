@@ -36,7 +36,6 @@ RUN pip install mysqlclient
 
 COPY ./config /app/config
 COPY ./src /app/src
-COPY ./utils /app/utils
 COPY entrypoint.sh .
 COPY mail_helper.py .
 

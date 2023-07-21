@@ -6,8 +6,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build, Resource
 from googleapiclient.errors import HttpError
 from src import app_configuration
-from utils.file_helper import write_to_file, delete_file
-from utils.api_logger import ApiLogger
+from src.utils.file_helper import write_to_file, delete_file
+from src.utils.api_logger import ApiLogger
 
 
 @dataclass

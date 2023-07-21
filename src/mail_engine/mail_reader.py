@@ -5,8 +5,8 @@ from dataclasses import dataclass, field
 from googleapiclient.errors import HttpError
 from src import env_configuration, app_configuration
 from src.mail_engine.mail_connection import GmailAuth
-from utils.api_logger import ApiLogger
-from utils.datetime_helper import (
+from src.utils.api_logger import ApiLogger
+from src.utils.datetime_helper import (
     find_datetime_from_strftime,
     change_format_from_datetime,
 )

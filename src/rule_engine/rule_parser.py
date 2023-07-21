@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from utils.json_reader import JsonReader
+from src.utils.json_reader import JsonReader
 
 
 @dataclass

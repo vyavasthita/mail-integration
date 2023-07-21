@@ -1,6 +1,6 @@
 from src.rule_engine.query_builder import AnyQueryBuilder, AllQueryBuilder
 from src.rule_engine.rule_data import RuleData
-from utils.api_logger import ApiLogger
+from src.utils.api_logger import ApiLogger
 
 
 class RuleEngine:

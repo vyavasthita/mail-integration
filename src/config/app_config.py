@@ -1,6 +1,6 @@
 from typing import List
 from dataclasses import dataclass, field
-from utils.json_reader import JsonReader
+from src.utils.json_reader import JsonReader
 
 
 @dataclass

@@ -1,7 +1,7 @@
 from src.mail_engine.mail_connection import GmailConnection
 from src.mail_engine.mail_reader import MailReader, LabelReader
 from src.mail_engine.mail_data_builder import MailDataBuilder
-from utils.api_logger import ApiLogger
+from src.utils.api_logger import ApiLogger
 
 
 # @dataclass

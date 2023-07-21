@@ -1,4 +1,4 @@
-from utils.api_logger import ApiLogger
+from src.utils.api_logger import ApiLogger
 
 
 def gen_data(env_configuration):
