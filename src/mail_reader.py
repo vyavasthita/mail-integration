@@ -1,17 +1,11 @@
-from __future__ import print_function
-
 import os.path
 import base64
 from bs4 import BeautifulSoup
 from typing import List
 from dataclasses import dataclass, field
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build, Resource
 from googleapiclient.errors import HttpError
 from src import env_configuration, app_configuration
-from utils.file_helper import write_to_file, delete_file
+from src.mail_connection import GmailAuth
 from utils.api_logger import ApiLogger
 from utils.datetime_helper import (
     find_datetime_from_strftime,
@@ -32,82 +26,8 @@ class MailField:
 
 
 @dataclass
-class ApiConnection:
-    """
-    The file token.json stores the user's access and refresh tokens, and is
-    created automatically when the authorization flow completes for the first
-    time.
-    """
-
-    auth_credential_json: str = "credentials.json"
-    token_json: str = "token.json"
-    creds: Credentials = None
-    service: Resource = None
-
-    def check_already_authenticated(self):
-        ApiLogger.log_info("Checking if user is already authenticated.")
-
-        # If scopes is modified, we should delete the file token.json
-        if os.path.exists(self.token_json):
-            ApiLogger.log_debug("Token file is present.")
-            self.creds = Credentials.from_authorized_user_file(
-                "token.json", scopes=app_configuration.api_config.scope
-            )
-
-    def user_log_in(self):
-        ApiLogger.log_info("Checking if user login is required.")
-        # We check whether or not token json is present
-        if not self.creds or not self.creds.valid:
-            ApiLogger.log_info("Token does not exist or invalid.")
-            # If token does not exist or is invalid, our program will open up
-            # the browser and ask for access to the User’s Gmail
-            # and save it for next time.
-            self.get_token()
-            # Save the credentials for the next run
-            write_to_file(data=self.creds.to_json(), out_file_path="token.json")
-
-    def get_token(self):
-        # token needs to be refreshed
-        if self.creds and self.creds.expired and self.creds.refresh_token:
-            ApiLogger.log_info(
-                "Token expired and refresh token is present. Get token from refresh token."
-            )
-            self.creds.refresh(Request())
-        else:
-            ApiLogger.log_info("Run the auth flow using browser.")
-            # Open the browser and run auth flow
-            self.creds = self.run_auth_flow()
-
-            ApiLogger.log_debug("Post auth flow, delete the credential json file.")
-            # Delete credential json file
-            delete_file(file_path=self.auth_credential_json)
-
-    def run_auth_flow(self):
-        flow = InstalledAppFlow.from_client_secrets_file(
-            self.auth_credential_json, scopes=app_configuration.api_config.scope
-        )
-        return flow.run_local_server(
-            open_browser=False,
-            bind_addr=app_configuration.api_config.host,
-            port=app_configuration.api_config.port,
-        )
-
-    def connect(self):
-        ApiLogger.log_info("Connect to Gmail API with access token.")
-        # Now, we will connect to the Gmail API with the access token.
-        try:
-            self.service = build("gmail", "v1", credentials=self.creds)
-        except HttpError as error:
-            ApiLogger.log_error(f"Failed to connect to Gmail API. {str(error)}")
-
-    def disconnect(self):
-        ApiLogger.log_info("Disconnect from Gmail API.")
-        self.service.close()
-
-
-@dataclass
-class Email:
-    api_connection: ApiConnection = field(default_factory=ApiConnection)
+class MailParser:
+    connection: GmailAuth = field(default_factory=GmailAuth)
 
     def parse_msg_attributes(self, headers: dict, mail_field: MailField):
         # payload dictionary contains ‘headers‘, ‘parts‘, ‘filename‘ etc.
@@ -126,26 +46,52 @@ class Email:
                 # find the datetime format
                 dt = find_datetime_from_strftime(header["value"])
                 mail_field.date = change_format_from_datetime(
-                    dt=dt, new_format="%Y-%m-%d"
+                    dt=dt, date_format="%Y-%m-%d"
                 )
 
     def parse_body(self, parts, mail_field: MailField):
-        # Get the data and decode it with base 64 decoder.
-        if parts["body"].get("data"):
-            data = parts["body"]["data"]
-            data = data.replace("-", "+").replace("_", "/")
-            decoded_data = base64.b64decode(data)
+        body_message = None
 
-            # Now, the data obtained is in lxml. So, we will parse
-            # it with BeautifulSoup library
-            soup = BeautifulSoup(decoded_data, "lxml")
-            mail_field.body = soup.body()
+        # Get the data and decode it with base 64 decoder.
+        for part in parts:
+            body = part.get("body")
+            data = body.get("data")
+            mimeType = part.get("mimeType")
+
+            # with attachment
+            if mimeType == "multipart/related":
+                for p in part.get("parts"):
+                    body = p.get("body")
+                    data = body.get("data")
+                    mimeType = p.get("mimeType")
+                    if mimeType == "text/plain":
+                        body_message = base64.urlsafe_b64decode(data)
+                    elif mimeType == "text/html":
+                        body_message = base64.urlsafe_b64decode(data)
+            # without attachment
+            elif mimeType == "text/plain":
+                body_message = base64.urlsafe_b64decode(data)
+            elif mimeType == "text/html":
+                body_message = base64.urlsafe_b64decode(data)
+
+        mail_field.body = body_message  # str(body_message, "utf-8")
+
+        # Now, the data obtained is in lxml. So, we will parse
+        # it with BeautifulSoup library
+        # soup = BeautifulSoup(decoded_data, "lxml")
+        # mail_field.body = soup.body()
+
+
+@dataclass
+class MailReader:
+    connection: GmailAuth = field(default_factory=GmailAuth)
+    mail_parser: MailParser = MailParser(connection)
 
     def get_detail(self, message, mail_field: MailField):
         try:
             # Get the message from its id
             email_data = (
-                self.api_connection.service.users()
+                self.connection.service.users()
                 .messages()
                 .get(userId=env_configuration.USER_ID, id=message["id"], format="full")
                 .execute()
@@ -164,13 +110,19 @@ class Email:
             headers = payload["headers"]
 
             mail_field.id = message["id"]
-
             mail_field.snippet = email_data["snippet"]
 
-            self.parse_msg_attributes(headers=headers, mail_field=mail_field)
+            self.mail_parser.parse_msg_attributes(
+                headers=headers, mail_field=mail_field
+            )
 
-            if payload.get("parts"):
-                self.parse_body(parts=payload.get("parts")[0], mail_field=mail_field)
+            # Temporarily use snippet text for message body
+            mail_field.body = mail_field.snippet
+
+            # if payload.get("parts"):
+            #     self.mail_parser.parse_body(
+            #         parts=payload.get("parts"), mail_field=mail_field
+            #     )
 
         except HttpError as error:
             print(f"Error occurred while parsing email message. {str(error)}")
@@ -189,7 +141,7 @@ class Email:
         """
         try:
             results = (
-                self.api_connection.service.users()
+                self.connection.service.users()
                 .messages()
                 .list(
                     userId=env_configuration.USER_ID,
@@ -206,7 +158,7 @@ class Email:
                 )
             )
 
-    def parse(self, db_data: dict):
+    def read(self, db_data: dict):
         # messages is a list of dictionaries where each dictionary contains a message id
         messages = self.fetch()
 
@@ -214,17 +166,32 @@ class Email:
             print("No messages were found.")
             return
 
+        #
+        if os.path.exists("message_data.txt"):
+            os.remove("message_data.txt")
+        #
+
         for message in messages:
             mail_field = MailField()
 
             self.get_detail(message=message, mail_field=mail_field)
 
             # Check if email is marked read by reading UNREAD label
+            is_read = "UNREAD" not in mail_field.labels
 
-            is_read = False
-
-            if "UNREAD" not in mail_field.labels:
-                is_read = True
+            #
+            with open("message_data.txt", "a") as f:
+                f.write(f"Message Id: {mail_field.id}\n")
+                f.write(f"From: {mail_field.sender}\n")
+                f.write(f"To: {mail_field.receiver}\n")
+                f.write(f"Subject: {mail_field.subject}\n")
+                f.write(f"Date: {mail_field.date}\n")
+                f.write(f"Labels: {mail_field.labels}\n")
+                f.write(f"Message: {mail_field.body}\n")
+                f.write(
+                    "***********************************************************************\n"
+                )
+            #
 
             db_data["email"].append((mail_field.id, is_read))
             # db_data["email_label"].append((mail_field.id, is_read))
@@ -232,18 +199,19 @@ class Email:
             db_data["receiver"].append((mail_field.id, mail_field.receiver))
             db_data["subject"].append((mail_field.id, mail_field.subject))
 
-            if mail_field.date:  # To Do: Why date is None ?
+            if mail_field.body:  # To Do: Why date is None ?
                 db_data["content"].append((mail_field.id, mail_field.body))
             db_data["date"].append((mail_field.id, mail_field.date))
 
+
 @dataclass
-class Label:
-    api_connection: ApiConnection = field(default_factory=ApiConnection)
+class LabelReader:
+    connection: GmailAuth = field(default_factory=GmailAuth)
 
     def fetch_labels(self):
         try:
             results = (
-                self.api_connection.service.users()
+                self.connection.service.users()
                 .labels()
                 .list(userId=env_configuration.USER_ID)
                 .execute()

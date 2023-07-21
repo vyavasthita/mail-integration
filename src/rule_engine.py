@@ -20,7 +20,7 @@ class RuleEngine:
         elif predicate == "any":
             return self.any_query_builder.build_any_predicate(conditions)
 
-    def apply_rule(self, selected_rule: str):
+    def start(self, selected_rule: str):
         ApiLogger.log_info(f"Applying rule {selected_rule}.")
 
         query = self.build(selected_rule)

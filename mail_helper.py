@@ -83,17 +83,17 @@ class CommandInterface:
 
 class MailHelper:
     def __init__(self) -> None:
+        print("Creating log directory")
+        create_log_directory()
+
         self.cli = CommandInterface()
         self.rule_data = RuleData()
         self.mail_engine = MailEngine()
         self.rule_engine = RuleEngine()
 
     def initialize(self):
-        print("Creating log directory")
-        create_log_directory()
-
         print(
-            "************************** Mail Helper CLI **********************************************"
+            "**************************************** Mail Helper CLI ****************************************"
         )
         self.cli.initialize_cmd()
 
@@ -117,12 +117,12 @@ class MailHelper:
         if choice.option == ArgOption.FETCH_EMAIL:
             ApiLogger.log_debug("Initializing credential json.")
             init_credential_json()
-            self.mail_engine.fetch_emails()
+            self.mail_engine.start()
             self.create_ftsi()
         elif choice.option == ArgOption.SHOW_RULES:
             self.show_rules(choice.rule)
         else:
-            self.rule_engine.apply_rule(choice.rule)
+            self.rule_engine.start(choice.rule)
 
 
 if __name__ == "__main__":

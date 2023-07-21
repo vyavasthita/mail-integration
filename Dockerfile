@@ -38,7 +38,7 @@ COPY ./config /app/config
 COPY ./src /app/src
 COPY ./utils /app/utils
 COPY entrypoint.sh .
-COPY main.py .
+COPY mail_helper.py .
 
 # Copy files for unit tests
 COPY ./tests /app/tests
