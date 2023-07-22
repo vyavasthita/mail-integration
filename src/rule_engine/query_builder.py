@@ -243,4 +243,3 @@ class AnyQueryBuilder(QueryBuilder):
         cumulative_query += QueryBuilder.Operator.SEMICOLON
 
         return cumulative_query
-

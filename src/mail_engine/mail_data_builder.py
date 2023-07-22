@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from src.mail_engine.mail_data import MailData
-from src.data_layer.email_dao import MailDao
+from src.data_layer.mail_dao import MailDao
 
 
 @dataclass
@@ -8,7 +8,7 @@ class MailDataBuilder:
     mail_data: list[MailData] = field(default_factory=list)
     data: dict = field(default_factory=dict)
 
-    def construct_data(self):
+    def construct_write_data(self):
         add_label = """
             INSERT INTO label(label_id, name) value(%s, %s) ON DUPLICATE KEY UPDATE name = name
         """
@@ -49,6 +49,9 @@ class MailDataBuilder:
         self.mail_data.append(MailData(add_subject, self.data["subject"]))
         self.mail_data.append(MailData(add_date, self.data["date"]))
         self.mail_data.append(MailData(add_content, self.data["content"]))
+
+    def construct_read_data(self):
+        pass
 
     def write_to_db(self):
         MailDao.create(self.mail_data)

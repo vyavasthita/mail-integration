@@ -17,7 +17,9 @@ class DBConnection:
         try:
             self.connection = connect(**DBConnection.config)
             self.cursor = self.connection.cursor()
-            print("Post connection")
+            print(
+                f"User '{self.connection.user}' is connected to '{self.connection.database}' database."
+            )
         except Error as error:
             if error.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -25,10 +27,8 @@ class DBConnection:
                 print("Database does not exist")
             else:
                 print(str(error))
-            
-            print(
-                    "We are not connected to databse. exiting."
-                )
+
+            print("We are not connected to databse. exiting.")
             sys.exit(0)
         except Exception as error:
             print(str(error))
@@ -41,4 +41,3 @@ class DBConnection:
             self.cursor.close()
             # close db connection
             self.connection.close()
-

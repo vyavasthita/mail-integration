@@ -17,3 +17,14 @@ class MailDao:
                 )
 
             db_connection.connection.commit()  # commit changes
+
+    @staticmethod
+    def read(query):
+        ApiLogger.log_info("Read email data fromm database.")
+        with DBConnection() as db_connection:
+            db_connection.connection.cursor.execute(query)
+            result = db_connection.connection.cursor.fetchall()
+
+            # print the results in each row
+            for r in result:
+                print(r)

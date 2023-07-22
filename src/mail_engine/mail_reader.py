@@ -158,6 +158,7 @@ class MailReader:
             )
 
     def read(self, db_data: dict):
+        ApiLogger.log_info("Reading emails from gmail")
         # messages is a list of dictionaries where each dictionary contains a message id
         messages = self.fetch()
 

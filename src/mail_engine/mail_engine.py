@@ -37,5 +37,5 @@ class MailEngine:
 
         self.data["label"] = label_data
 
-        self.mail_data_builder.construct_data()
+        self.mail_data_builder.construct_write_data()
         self.mail_data_builder.write_to_db()

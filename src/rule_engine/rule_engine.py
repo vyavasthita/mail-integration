@@ -1,28 +1,35 @@
+from dataclasses import dataclass, field
 from src.rule_engine.query_builder import AnyQueryBuilder, AllQueryBuilder
-from src.rule_engine.rule_data import RuleData
+from src.rule_engine.action_builder import ActionBuilder
 from src.utils.api_logger import ApiLogger
+from src.data_layer.mail_dao import MailDao
 
 
+@dataclass
 class RuleEngine:
-    def __init__(self) -> None:
-        self.rule_data = RuleData()
-        self.any_query_builder = AnyQueryBuilder()
-        self.all_query_builder = AllQueryBuilder()
+    rule_data: dict = field(default_factory=dict)
 
-    def build(self, selected_rule: str):
-        selected_rule_data = self.rule_data.get_rule(selected_rule)
-
-        predicate = selected_rule_data["predicate"]
-        conditions = selected_rule_data["conditions"]
-
+    def build_query(self, predicate: str, conditions: dict):
         if predicate == "all":
-            return self.all_query_builder.build_all_predicate(conditions)
+            all_query_builder = AllQueryBuilder()
+            return all_query_builder.build_all_predicate(conditions)
         elif predicate == "any":
-            return self.any_query_builder.build_any_predicate(conditions)
+            any_query_builder = AnyQueryBuilder()
+            return any_query_builder.build_any_predicate(conditions)
 
-    def start(self, selected_rule: str):
-        ApiLogger.log_info(f"Applying rule {selected_rule}.")
+    def build_actions(self, actions: dict):
+        action_builder = ActionBuilder(actions)
 
-        query = self.build(selected_rule)
+    def build(self, selected_rule_data: dict):
+        query = self.build_query(
+            selected_rule_data["predicate"], selected_rule_data["conditions"]
+        )
+
+        actions = self.build_actions(selected_rule_data["actions"])
+
+        return query
+
+    def start(self, selected_rule_data: dict):
+        query = self.build(selected_rule_data)
 
         print(query)

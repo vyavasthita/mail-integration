@@ -6,13 +6,13 @@ from dataclasses import dataclass
 @dataclass
 class JsonReader:
     file_path: str
-    data: dict = None
 
     def read(self):
+        data = None
         if os.path.exists(self.file_path):
             try:
                 with open(self.file_path) as json_file_object:
-                    self.data = json.load(json_file_object)
+                    data = json.load(json_file_object)
             except ValueError as error:
                 print(f"Invalid Json File. {self.file_path}")
         else:
@@ -21,4 +21,4 @@ class JsonReader:
                     self.file_path
                 )
             )
-        return self.data
+        return data

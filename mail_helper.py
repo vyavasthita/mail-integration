@@ -1,11 +1,13 @@
+import os
 import json
 import argparse
 from enum import IntEnum
 from dataclasses import dataclass
+from src import environment
 from src.initialize import init_credential_json
 from src.data_layer.sp_dao import SPDao
 from src import create_log_directory
-from src.rule_engine.rule_data import RuleData
+from src.rule_engine.rule_parser import RuleParser
 from src.mail_engine.mail_engine import MailEngine
 from src.rule_engine.rule_engine import RuleEngine
 from src.utils.api_logger import ApiLogger
@@ -98,15 +100,17 @@ class MailHelper:
         print("Creating log directory")
         create_log_directory()
 
+        rule_file_path = os.path.join(
+            os.getcwd(), "config", environment, "email_rules.json"
+        )
+
         self.cli = CommandInterface()
-        self.rule_data = RuleData()
-        self.mail_engine = MailEngine()
-        self.rule_engine = RuleEngine()
+        self.rule_parser = RuleParser(rule_file_path)
 
     def initialize(self):
-        print(
-            "**************************************** Mail Helper CLI ****************************************"
-        )
+        print("************************ Mail Helper CLI ************************")
+        init_credential_json()
+        self.rule_parser.parse()
         self.cli.initialize_cmd()
 
     @check_db_connection
@@ -117,9 +121,9 @@ class MailHelper:
         ApiLogger.log_info(f"Show rule {rule}.")
 
         if rule == "all":
-            print(json.dumps(self.rule_data.get_all(), indent=1))
+            print(json.dumps(self.rule_parser.get_all(), indent=1))
         else:
-            print(json.dumps(self.rule_data.get_rule(rule), indent=1))
+            print(json.dumps(self.rule_parser.get_rule(rule), indent=1))
 
     def create_ftsi(self):
         ApiLogger.log_info(
@@ -130,16 +134,20 @@ class MailHelper:
     @check_db_connection
     def start_mail_engine(self):
         ApiLogger.log_debug("Initializing credential json.")
-        init_credential_json()
+        self.mail_engine = MailEngine()
+
         self.mail_engine.start()
         self.create_ftsi()
 
     @check_db_connection
     def start_rule_engine(self, rule: str):
-        self.rule_engine.start(rule)
+        rule_data = self.rule_parser.get_rule(rule)
+        rule_engine = RuleEngine()
+
+        rule_engine.start(rule_data)
 
     def start(self):
-        choice = self.cli.get_choice(self.rule_data.get_available_rules())
+        choice = self.cli.get_choice(self.rule_parser.get_available_rules())
 
         if choice.option == ArgOption.VALIDATE:
             self.validate()
