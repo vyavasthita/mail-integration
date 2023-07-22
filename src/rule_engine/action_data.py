@@ -4,11 +4,11 @@ from enum import Enum, IntEnum
 
 class ActionCode(IntEnum):
     MOVE = 1
-    READ_UNREAD = 2
-    
+    READ = 2
+    UNREAD = 3
+
 
 @dataclass
 class ActionData:
     code: int = None
-    destination: str = None
-
+    label: str = None

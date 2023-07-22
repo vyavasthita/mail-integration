@@ -10,5 +10,5 @@ class ActionBuilder:
 
     def get_actions(self):
         for action in self.actions:
-            self.action_data.append(ActionData(action["code"], action["destination"]))
+            self.action_data.append(ActionData(action["code"], action["label"]))
 

@@ -35,9 +35,6 @@ class RuleEngine:
         return query
 
     def start(self, selected_rule_data: dict):
-        move_api_data = list()
-        read_unread_api_data = list()
-
         api_engine = ApiEngine()
 
         query = self.build(selected_rule_data)
@@ -46,13 +43,4 @@ class RuleEngine:
 
         result_set = MailDao.read(query)
 
-
-        # for result in result_set:
-        #     for action_data in self.action_data:
-        #         if action_data.code == ActionCode.MOVE:
-        #             move_api_data.append((result[0], action_data.destination))
-        #         else:
-        #             read_unread_api_data.append((result[0], action_data.destination))
-        api_engine.move_message(move_api_data)
-
-        print("*******************************")
+        api_engine.update_label(result_set, self.action_data)
