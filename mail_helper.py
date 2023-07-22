@@ -3,21 +3,19 @@ import json
 import argparse
 from enum import IntEnum
 from dataclasses import dataclass
-from src import environment, app_configuration
 from src.initialize import (
     init_credential_json,
     create_ftsi,
     check_ftsi,
-    start_auth,
     validate_auth,
 )
+from src import environment
 from src import create_log_directory
-from src.auth_engine.auth_validation import AuthValidation
+from src.auth.auth import Auth
 from src.rule_engine.rule_parser import RuleParser
 from src.mail_engine.mail_engine import MailEngine
 from src.rule_engine.rule_engine import RuleEngine
 from src.utils.api_logger import ApiLogger
-from src.utils.file_helper import delete_file
 from src.data_layer.db_validation import check_db_connection
 
 
@@ -143,12 +141,12 @@ class MailHelper:
         self.cli.initialize_cmd()
 
     def auth(self):
-        auth_validation = AuthValidation()
-        auth_validation.start()
+        auth = Auth()
+        auth.start()
 
     def un_auth(self):
-        auth_validation = AuthValidation()
-        auth_validation.un_authenticate()
+        auth = Auth()
+        auth.un_authenticate()
 
     @check_db_connection
     def validate(self):

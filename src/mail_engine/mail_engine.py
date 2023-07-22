@@ -1,4 +1,4 @@
-from src.auth_engine.gmail_auth import GmailConnection
+from src.auth.gmail_auth import GmailConnection
 from src.mail_engine.mail_reader import MailReader, LabelReader
 from src.mail_engine.mail_data_builder import MailDataBuilder
 from src.utils.api_logger import ApiLogger

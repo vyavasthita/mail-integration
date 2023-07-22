@@ -1,12 +1,11 @@
 from src import app_configuration, env_configuration
-from src.auth_engine.gmail_auth import GmailConnection
 from src.utils.file_helper import check_file_exists, delete_file
+from src.auth.gmail_auth import GmailConnection
 from src.utils.json_reader import JsonReader
-from src import app_configuration
 from src.utils.api_logger import ApiLogger
 
 
-class AuthValidation:
+class Auth:
     def is_authenticated(self):
         ApiLogger.log_info("Checking if user is already authenticated.")
         return (
@@ -26,7 +25,7 @@ class AuthValidation:
         if self.is_authenticated():
             ApiLogger.log_info("User is already authenticated.")
         else:
-            with GmailConnection() as connection:
+            with GmailConnection() as connection:  # do auth flow
                 pass
 
         # Read refresh token from token.json file and save in memory

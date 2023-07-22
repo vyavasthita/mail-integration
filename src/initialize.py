@@ -4,7 +4,7 @@ from src.utils.gen_credential_data import gen_data
 from src.utils.file_helper import write_to_json
 from src.utils.api_logger import ApiLogger
 from src.data_layer.sp_dao import SPDao
-from src.auth_engine.auth_validation import AuthValidation
+from src.auth.auth import Auth
 
 
 def init_credential_json():
@@ -30,8 +30,8 @@ def check_ftsi(func):
 
 
 def start_auth():
-    auth_validation = AuthValidation()
-    auth_validation.start()
+    auth = Auth()
+    auth.start()
 
 
 def validate_auth(func):

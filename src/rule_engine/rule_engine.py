@@ -5,7 +5,7 @@ from src.rule_engine.action_builder import ActionBuilder
 from src.rule_engine.action_data import ActionData, ActionCode
 from src.utils.api_logger import ApiLogger
 from src.data_layer.mail_dao import MailDao
-from src.api_engine.api_engine import ApiEngine
+from src.api.api_request import ApiRequest
 
 
 @dataclass
@@ -35,12 +35,10 @@ class RuleEngine:
         return query
 
     def start(self, selected_rule_data: dict):
-        api_engine = ApiEngine()
+        api_request = ApiRequest()
 
         query = self.build(selected_rule_data)
-        print(query)
-        print("*****************************")
 
         result_set = MailDao.read(query)
 
-        api_engine.update_label(result_set, self.action_data)
+        api_request.update_label(result_set, self.action_data)

@@ -1,14 +1,12 @@
 from typing import List
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from src import env_configuration
-from src.api_engine.api_request import ApiRequest
 from src.rule_engine.action_data import ActionData, ActionCode
-from src.utils.api_logger import ApiLogger
+from src.auth.connection import AuthConnection
 
 
 @dataclass
-class ApiEngine:
-    api_request: ApiRequest = field(default_factory=ApiRequest)
+class ApiRequest:
     api_url: str = env_configuration.API_URL
 
     def get_message_ids(self, message_ids: list):
@@ -35,6 +33,5 @@ class ApiEngine:
     def update_label(self, message_ids: list, action_data: List[ActionData]):
         url = "https://gmail.googleapis.com/gmail/v1/users/me/messages/batchModify"
 
-        self.api_request.update_label(
-            url=url, request_body=self.get_request_body(message_ids, action_data)
-        )
+        with AuthConnection() as auth:
+            auth.session.post(url, data=self.get_request_body(message_ids, action_data))

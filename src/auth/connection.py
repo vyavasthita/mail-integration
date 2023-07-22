@@ -4,7 +4,7 @@ from src import env_configuration
 from src import app_configuration
 
 
-class ApiAuth:
+class AuthConnection:
     def __init__(self):
         self.session = OAuth2Session(
             client_id=env_configuration.CLIENT_ID,
