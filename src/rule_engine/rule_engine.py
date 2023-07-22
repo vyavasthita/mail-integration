@@ -2,9 +2,10 @@ from typing import List
 from dataclasses import dataclass, field
 from src.rule_engine.query_builder import AnyQueryBuilder, AllQueryBuilder
 from src.rule_engine.action_builder import ActionBuilder
-from src.rule_engine.action_data import ActionData
+from src.rule_engine.action_data import ActionData, ActionCode
 from src.utils.api_logger import ApiLogger
 from src.data_layer.mail_dao import MailDao
+from src.api_engine.api_engine import ApiEngine
 
 
 @dataclass
@@ -34,21 +35,24 @@ class RuleEngine:
         return query
 
     def start(self, selected_rule_data: dict):
+        move_api_data = list()
+        read_unread_api_data = list()
+
+        api_engine = ApiEngine()
+
         query = self.build(selected_rule_data)
         print(query)
         print("*****************************")
 
-        messages_ids = MailDao.read(query)
+        result_set = MailDao.read(query)
 
-        for message_id in messages_ids:
-            # Call Api engine to call restapi
-            print(message_id)
 
-        print("*****************************")
-
-        for action_data in self.action_data:
-            print(action_data.code)
-            print(action_data.destination)
-            print("----------------------------------")
+        # for result in result_set:
+        #     for action_data in self.action_data:
+        #         if action_data.code == ActionCode.MOVE:
+        #             move_api_data.append((result[0], action_data.destination))
+        #         else:
+        #             read_unread_api_data.append((result[0], action_data.destination))
+        api_engine.move_message(move_api_data)
 
         print("*******************************")

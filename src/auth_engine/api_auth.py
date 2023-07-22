@@ -23,6 +23,9 @@ class ApiAuth:
             refresh_token=env_configuration.REFRESH_TOKEN,
             **extra
         )
+        print("********* getting token ***********")
+        print(env_configuration.REFRESH_TOKEN)
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.session.close()
