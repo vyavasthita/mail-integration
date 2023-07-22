@@ -4,8 +4,7 @@ import argparse
 from enum import IntEnum
 from dataclasses import dataclass
 from src import environment
-from src.initialize import init_credential_json
-from src.data_layer.sp_dao import SPDao
+from src.initialize import init_credential_json, create_ftsi
 from src import create_log_directory
 from src.rule_engine.rule_parser import RuleParser
 from src.mail_engine.mail_engine import MailEngine
@@ -125,26 +124,21 @@ class MailHelper:
         else:
             print(json.dumps(self.rule_parser.get_rule(rule), indent=1))
 
-    def create_ftsi(self):
-        ApiLogger.log_info(
-            "Calling stored procedure to create full text search indexes."
-        )
-        SPDao.call_sp("create_fti")
-
     @check_db_connection
+    @create_ftsi
     def start_mail_engine(self):
         ApiLogger.log_debug("Initializing credential json.")
         self.mail_engine = MailEngine()
 
         self.mail_engine.start()
-        self.create_ftsi()
 
     @check_db_connection
+    @create_ftsi
     def start_rule_engine(self, rule: str):
         rule_data = self.rule_parser.get_rule(rule)
         rule_engine = RuleEngine()
 
-        rule_engine.start(rule_data)
+        # rule_engine.start(rule_data)
 
     def start(self):
         choice = self.cli.get_choice(self.rule_parser.get_available_rules())
