@@ -169,3 +169,5 @@ credentials.json
 token.json
 
 database/data
+
+poetry.toml
