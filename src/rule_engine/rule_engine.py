@@ -1,6 +1,8 @@
+from typing import List
 from dataclasses import dataclass, field
 from src.rule_engine.query_builder import AnyQueryBuilder, AllQueryBuilder
 from src.rule_engine.action_builder import ActionBuilder
+from src.rule_engine.action_data import ActionData
 from src.utils.api_logger import ApiLogger
 from src.data_layer.mail_dao import MailDao
 
@@ -8,6 +10,7 @@ from src.data_layer.mail_dao import MailDao
 @dataclass
 class RuleEngine:
     rule_data: dict = field(default_factory=dict)
+    action_data: List[ActionData] = field(default_factory=list)
 
     def build_query(self, predicate: str, conditions: dict):
         if predicate == "all":
@@ -18,18 +21,33 @@ class RuleEngine:
             return any_query_builder.build_any_predicate(conditions)
 
     def build_actions(self, actions: dict):
-        action_builder = ActionBuilder(actions)
+        action_builder = ActionBuilder(actions, self.action_data)
+        action_builder.get_actions()
 
     def build(self, selected_rule_data: dict):
         query = self.build_query(
             selected_rule_data["predicate"], selected_rule_data["conditions"]
         )
 
-        actions = self.build_actions(selected_rule_data["actions"])
+        self.build_actions(selected_rule_data["actions"])
 
         return query
 
     def start(self, selected_rule_data: dict):
         query = self.build(selected_rule_data)
-
         print(query)
+        print("*****************************")
+
+        messages_ids = MailDao.read(query)
+
+        for message_id in messages_ids:
+            print(message_id)
+
+        print("*****************************")
+
+        for action_data in self.action_data:
+            print(action_data.code)
+            print(action_data.destination)
+            print("----------------------------------")
+
+        print("*******************************")
