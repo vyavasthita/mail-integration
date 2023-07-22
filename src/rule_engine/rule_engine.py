@@ -41,6 +41,7 @@ class RuleEngine:
         messages_ids = MailDao.read(query)
 
         for message_id in messages_ids:
+            # Call Api engine to call restapi
             print(message_id)
 
         print("*****************************")

@@ -4,7 +4,7 @@ from typing import List
 from dataclasses import dataclass, field
 from googleapiclient.errors import HttpError
 from src import env_configuration, app_configuration
-from src.mail_engine.mail_connection import GmailAuth
+from src.auth_engine.gmail_auth import GmailAuth
 from src.utils.api_logger import ApiLogger
 from src.utils.datetime_helper import (
     find_datetime_from_strftime,

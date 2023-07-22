@@ -3,21 +3,31 @@ import json
 import argparse
 from enum import IntEnum
 from dataclasses import dataclass
-from src import environment
-from src.initialize import init_credential_json, create_ftsi
+from src import environment, app_configuration
+from src.initialize import (
+    init_credential_json,
+    create_ftsi,
+    check_ftsi,
+    start_auth,
+    validate_auth,
+)
 from src import create_log_directory
+from src.auth_engine.auth_validation import AuthValidation
 from src.rule_engine.rule_parser import RuleParser
 from src.mail_engine.mail_engine import MailEngine
 from src.rule_engine.rule_engine import RuleEngine
 from src.utils.api_logger import ApiLogger
+from src.utils.file_helper import delete_file
 from src.data_layer.db_validation import check_db_connection
 
 
 class ArgOption(IntEnum):
     VALIDATE = 1
-    FETCH_EMAIL = 2
-    SHOW_RULES = 3
-    APPLY_RULES = 4
+    AUTH = 2
+    UNAUTH = 3
+    EMAIL = 4
+    SHOW_RULES = 5
+    APPLY_RULES = 6
 
 
 class CommandInterface:
@@ -49,8 +59,24 @@ class CommandInterface:
         )
 
         group.add_argument(
+            "-a",
+            "--auth",
+            default=False,
+            action="store_true",
+            help="To do authentication with gmail api.",
+        )
+
+        group.add_argument(
+            "-u",
+            "--unauth",
+            default=False,
+            action="store_true",
+            help="To do un-authentication with gmail api.",
+        )
+
+        group.add_argument(
             "-e",
-            "--emails",
+            "--email",
             default=False,
             action="store_true",
             help="To fetch emails from Gmail",
@@ -66,7 +92,7 @@ class CommandInterface:
         )
 
         group.add_argument(
-            "-a",
+            "-ar",
             "--applyrule",
             choices=available_rules,
             help="Apply given rule by its name with value from json key 'rule'",
@@ -82,8 +108,12 @@ class CommandInterface:
 
         if args.validate:
             choice.option = ArgOption.VALIDATE
-        elif args.emails:
-            choice.option = ArgOption.FETCH_EMAIL
+        elif args.auth:
+            choice.option = ArgOption.AUTH
+        elif args.unauth:
+            choice.option = ArgOption.UNAUTH
+        elif args.email:
+            choice.option = ArgOption.EMAIL
         elif args.showrules:
             choice.option = ArgOption.SHOW_RULES
             choice.rule = args.showrules[0]
@@ -112,6 +142,14 @@ class MailHelper:
         self.rule_parser.parse()
         self.cli.initialize_cmd()
 
+    def auth(self):
+        auth_validation = AuthValidation()
+        auth_validation.start()
+
+    def un_auth(self):
+        auth_validation = AuthValidation()
+        auth_validation.un_authenticate()
+
     @check_db_connection
     def validate(self):
         print("All validations are done, please proceed.")
@@ -125,15 +163,18 @@ class MailHelper:
             print(json.dumps(self.rule_parser.get_rule(rule), indent=1))
 
     @check_db_connection
-    @create_ftsi
+    @validate_auth
     def start_mail_engine(self):
-        ApiLogger.log_debug("Initializing credential json.")
+        ApiLogger.log_debug("Starting mail engine.")
         self.mail_engine = MailEngine()
 
         self.mail_engine.start()
 
+        create_ftsi()
+
     @check_db_connection
-    @create_ftsi
+    @validate_auth
+    @check_ftsi
     def start_rule_engine(self, rule: str):
         rule_data = self.rule_parser.get_rule(rule)
         rule_engine = RuleEngine()
@@ -145,11 +186,15 @@ class MailHelper:
 
         if choice.option == ArgOption.VALIDATE:
             self.validate()
-        elif choice.option == ArgOption.FETCH_EMAIL:
+        if choice.option == ArgOption.AUTH:
+            self.auth()
+        if choice.option == ArgOption.UNAUTH:
+            self.un_auth()
+        elif choice.option == ArgOption.EMAIL:
             self.start_mail_engine()
         elif choice.option == ArgOption.SHOW_RULES:
             self.show_rules(choice.rule)
-        else:
+        elif choice.option == ArgOption.APPLY_RULES:
             self.start_rule_engine(choice.rule)
 
 

@@ -36,6 +36,8 @@ class DevelopmentConfig:
     AUTH_PROVIDER_X509_CERT_URL = os.getenv("AUTH_PROVIDER_X509_CERT_URL_DEV")
     CLIENT_SECRET = os.getenv("CLIENT_SECRET_DEV")
     REDIRECT_URIS = os.getenv("REDIRECT_URIS_DEV")
+    API_URL = os.getenv("API_URL_DEV")
+    REFRESH_TOKEN = os.getenv("REFRESH_TOKEN_DEV") or None
 
     SCOPES_DEV = os.getenv("SCOPES_DEV")
     SCOPES = SCOPES_DEV.split(", ")

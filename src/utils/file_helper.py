@@ -19,3 +19,6 @@ def delete_file(file_path):
     else:
         # If it fails, inform the user.
         print(f"Failed to delete {file_path}. File does not exist.")
+
+def check_file_exists(file_path):
+    return os.path.exists(file_path)

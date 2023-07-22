@@ -1,4 +1,3 @@
-import os.path
 from dataclasses import dataclass
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -6,8 +5,9 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build, Resource
 from googleapiclient.errors import HttpError
 from src import app_configuration
-from src.utils.file_helper import write_to_file, delete_file
+from src.utils.file_helper import write_to_file, delete_file, check_file_exists
 from src.utils.api_logger import ApiLogger
+from src import app_configuration
 
 
 @dataclass
@@ -19,7 +19,7 @@ class GmailAuth:
     """
 
     auth_credential_json: str = "credentials.json"
-    token_json: str = "token.json"
+    token_json: str = app_configuration.api_config.token_file_path
     creds: Credentials = None
     service: Resource = None
 
@@ -27,7 +27,7 @@ class GmailAuth:
         ApiLogger.log_info("Checking if user is already authenticated.")
 
         # If scopes is modified, we should delete the file token.json
-        if os.path.exists(self.token_json):
+        if check_file_exists(self.token_json):
             ApiLogger.log_debug("Token file is present.")
             self.creds = Credentials.from_authorized_user_file(
                 "token.json", scopes=app_configuration.api_config.scope

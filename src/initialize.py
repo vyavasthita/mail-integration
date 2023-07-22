@@ -1,9 +1,10 @@
 from functools import wraps
-from src import env_configuration
+from src import env_configuration, app_configuration
 from src.utils.gen_credential_data import gen_data
 from src.utils.file_helper import write_to_json
 from src.utils.api_logger import ApiLogger
 from src.data_layer.sp_dao import SPDao
+from src.auth_engine.auth_validation import AuthValidation
 
 
 def init_credential_json():
@@ -15,10 +16,28 @@ def init_credential_json():
     )
 
 
-def create_ftsi(func):
+def create_ftsi():
+    SPDao.call_sp(app_configuration.api_config.index_sp_name)
+
+
+def check_ftsi(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        SPDao.call_sp("create_fti")
+        create_ftsi()
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+def start_auth():
+    auth_validation = AuthValidation()
+    auth_validation.start()
+
+
+def validate_auth(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_auth()
         return func(*args, **kwargs)
 
     return wrapper

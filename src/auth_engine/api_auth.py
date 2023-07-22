@@ -20,15 +20,9 @@ class ApiAuth:
 
         self.session.refresh_token(
             token_url=env_configuration.TOKEN_URI,
-            refresh_token="",
+            refresh_token=env_configuration.REFRESH_TOKEN,
             **extra
         )
-
-        # Get your authenticated response
-        response = self.session.get("")
-        print(response.status_code)
-        print(response.text)
-        return self.session
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.session.close()

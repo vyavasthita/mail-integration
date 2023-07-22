@@ -5,8 +5,10 @@ from src.utils.json_reader import JsonReader
 
 @dataclass
 class ApiConfigData:
+    token_file_path: str = None
     host: str = None
     port: int = None
+    index_sp_name: str = None
     scope: List[str] = field(default_factory=list)
 
 
@@ -32,8 +34,10 @@ class AppConfigParser:
         self.data = json_reader.read()
 
         api_config = ApiConfigData(
+            token_file_path=self.data["api"]["token_file_path"],
             host=self.data["api"]["host"],
             port=self.data["api"]["port"],
+            index_sp_name=self.data["api"]["index_sp_name"],
             scope=self.data["api"]["scope"],
         )
 
