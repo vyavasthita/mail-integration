@@ -1,9 +1,9 @@
 import os
 from src import env_configuration, environment
 from src.rule_engine.rule_parser import RuleParser
-from utils.gen_credential_data import gen_data
-from utils.file_helper import write_to_json
-from utils.api_logger import ApiLogger
+from src.utils.gen_credential_data import gen_data
+from src.utils.file_helper import write_to_json
+from src.utils.api_logger import ApiLogger
 
 
 def init_rule_parser():

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from src.mail_engine.mail_data import MailData
-from src.db.db_dao import MailDao
+from src.data_layer.email_dao import MailDao
 
 
 @dataclass

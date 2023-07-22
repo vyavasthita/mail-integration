@@ -1,6 +1,5 @@
 from typing import List
-from mysql.connector import Error, errorcode, Warning
-from src.db.db_init import DBConnection
+from src.data_layer.db_connection import DBConnection
 from src.mail_engine.mail_data import MailData
 from src.utils.api_logger import ApiLogger
 
@@ -8,6 +7,7 @@ from src.utils.api_logger import ApiLogger
 class MailDao:
     @staticmethod
     def create(mails_data: List[MailData]):
+        ApiLogger.log_info("Writing email data to database.")
         with DBConnection() as db_connection:
             db_connection.connection.start_transaction()
 
@@ -17,15 +17,3 @@ class MailDao:
                 )
 
             db_connection.connection.commit()  # commit changes
-
-
-class SPDao:
-    @staticmethod
-    def call_sp(name: str):
-        with DBConnection() as db_connection:
-            try:
-                db_connection.cursor.callproc(name)
-            except Warning as warning:
-                ApiLogger.log_info(warning)
-            except Error as error:
-                ApiLogger.log_info(error.msg)
