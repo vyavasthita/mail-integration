@@ -166,8 +166,8 @@ class MailHelper:
     @validate_auth
     def start_mail_engine(self):
         ApiLogger.log_debug("Starting mail engine.")
-        self.mail_engine = MailEngine()
 
+        self.mail_engine = MailEngine()
         self.mail_engine.start()
 
         create_ftsi()
@@ -179,7 +179,7 @@ class MailHelper:
         rule_data = self.rule_parser.get_rule(rule)
         rule_engine = RuleEngine()
 
-        # rule_engine.start(rule_data)
+        rule_engine.start(rule_data)
 
     def start(self):
         choice = self.cli.get_choice(self.rule_parser.get_available_rules())

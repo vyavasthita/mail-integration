@@ -1,9 +1,12 @@
-CREATE DATABASE IF NOT EXISTS mails;
+CREATE DATABASE IF NOT EXISTS testingdb;
 
-use mails;
+use testingdb;
 
 CREATE USER IF NOT EXISTS 'local'@'localhost' IDENTIFIED BY 'local';
-GRANT ALL PRIVILEGES ON mails.* TO 'local'@'localhost';
+-- GRANT ALL PRIVILEGES ON testingdb.* TO 'local'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'local'@'localhost' WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;
 
 CREATE TABLE IF NOT EXISTS label(  
     label_id varchar(25) NOT NULL,  
@@ -64,7 +67,7 @@ CREATE TABLE IF NOT EXISTS email_date(
 );
 
 DELIMITER $$
-CREATE DEFINER='local'@'localhost' FUNCTION IF NOT EXISTS check_index_exists(
+CREATE DEFINER='root'@'localhost' FUNCTION IF NOT EXISTS check_index_exists(
 table_name VARCHAR(15), 
 column_name VARCHAR(15)
 )
@@ -75,7 +78,7 @@ BEGIN
 
     SELECT COUNT(1) INTO index_found
     FROM INFORMATION_SCHEMA.STATISTICS
-    WHERE table_schema = 'mails'
+    WHERE table_schema = 'testingdb'
     AND   table_name   = table_name
     AND   index_name   = column_name;
 
@@ -86,7 +89,7 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS create_fti;
 
 DELIMITER $$
-CREATE DEFINER='local'@'localhost' PROCEDURE IF NOT EXISTS create_fti()
+CREATE DEFINER='root'@'localhost' PROCEDURE IF NOT EXISTS create_fti()
 BEGIN
 	DECLARE is_found INTEGER;
 
@@ -96,7 +99,7 @@ BEGIN
     IF is_found = 0 THEN
         ALTER TABLE email_sender ADD FULLTEXT(sender);
     ELSE
-        SELECT CONCAT('Index ','sender ','already exists on Table ', 'mails','.','email_sender');   
+        SELECT CONCAT('Index ','sender ','already exists on Table ', 'testingdb','.','email_sender');   
     END IF;
 
     -- Check index 'receiver' exists for table 'email_receiver'
@@ -105,7 +108,7 @@ BEGIN
     IF is_found = 0 THEN
          ALTER TABLE email_receiver ADD FULLTEXT(receiver);
     ELSE
-        SELECT CONCAT('Index ','receiver ','already exists on Table ', 'mails','.','email_receiver');   
+        SELECT CONCAT('Index ','receiver ','already exists on Table ', 'testingdb','.','email_receiver');   
     END IF;
 
     -- Check index 'subject' exists for table 'email_subject'
@@ -114,7 +117,7 @@ BEGIN
     IF is_found = 0 THEN
         ALTER TABLE email_subject ADD FULLTEXT(subject);
     ELSE
-        SELECT CONCAT('Index ','subject ','already exists on Table ', 'mails','.','email_subject');   
+        SELECT CONCAT('Index ','subject ','already exists on Table ', 'testingdb','.','email_subject');   
     END IF;
 
     -- Check index 'content' exists for table 'email_content'
@@ -123,7 +126,7 @@ BEGIN
     IF is_found = 0 THEN
         ALTER TABLE email_content ADD FULLTEXT(content);
     ELSE
-        SELECT CONCAT('Index ','content ','already exists on Table ', 'mails','.','email_content');   
+        SELECT CONCAT('Index ','content ','already exists on Table ', 'testingdb','.','email_content');   
     END IF;
     
 END $$
