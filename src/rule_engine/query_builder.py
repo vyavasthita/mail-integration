@@ -1,11 +1,8 @@
 # Ref: https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
 from enum import Enum, IntEnum
-
-
 from src.utils.datetime_helper import (
     get_today,
     subtract_days,
-    add_days,
     change_format_from_datetime,
 )
 
@@ -23,6 +20,8 @@ class QueryBuilder:
         EQUAL = "="
         NOT_EQUAL = "!="
         TAB = "\t"
+        LESS_THAN = "<"
+        GREATOR_THAN = ">"
 
     class Field(IntEnum):
         FROM = 1
@@ -70,22 +69,10 @@ class QueryBuilder:
             predicate_value * 30 if predicate_duration == "months" else predicate_value
         )
 
-    def get_date_field_dates(self, predicate_code: int, days_duration: str):
-        today_date = get_today()
-        start = None
-        end = None
-
-        if predicate_code == QueryBuilder.Predicate.LESS_THAN:
-            end = today_date
-            start = subtract_days(end, days_duration)
-        elif predicate_code == QueryBuilder.Predicate.GREATOR_THAN:
-            start = today_date
-            end = add_days(start, days_duration)
-
-        start_date = change_format_from_datetime(start, "%Y-%m-%d")
-        end_date = change_format_from_datetime(end, "%Y-%m-%d")
-
-        return start_date, end_date
+    def get_start_date(self, days_duration: str):
+        return change_format_from_datetime(
+            subtract_days(get_today(), days_duration), "%Y-%m-%d"
+        )
 
     def gen_date_field_query_str(
         self,
@@ -94,12 +81,18 @@ class QueryBuilder:
         predicate_value: str,
         predicate_duration: str,
     ):
-        # (received BETWEEN '2023-06-20' AND '2023-07-20')
-        start_date, end_date = self.get_date_field_dates(
-            predicate_code, self.get_date_duration(predicate_value, predicate_duration)
+        start_date = self.get_start_date(
+            self.get_date_duration(predicate_value, predicate_duration)
         )
 
-        return f"({column} BETWEEN '{start_date}' AND '{end_date}')"
+        condition_operator = str()
+
+        if predicate_code == QueryBuilder.Predicate.LESS_THAN:
+            condition_operator = QueryBuilder.Operator.LESS_THAN
+        elif predicate_code == QueryBuilder.Predicate.GREATOR_THAN:
+            condition_operator = QueryBuilder.Operator.GREATOR_THAN
+
+        return f"{column} {condition_operator} '{start_date}'"
 
     def gen_str_field_query_str(self, column, condition_predicate: dict):
         predicate_code = condition_predicate["code"]

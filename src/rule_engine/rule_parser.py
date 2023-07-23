@@ -23,3 +23,11 @@ class RuleParser:
         for rule_data in self.data:
             if rule_data.get("rule") == rule:
                 return rule_data
+
+    def get_labels(self):
+        return {
+            rule_data["rule"]: [
+                action["label"].upper() for action in rule_data["actions"]
+            ]
+            for rule_data in self.data
+        }

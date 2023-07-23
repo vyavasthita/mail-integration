@@ -50,8 +50,5 @@ class MailDataBuilder:
         self.mail_data.append(MailData(add_date, self.data["date"]))
         self.mail_data.append(MailData(add_content, self.data["content"]))
 
-    def construct_read_data(self):
-        pass
-
     def write_to_db(self):
         MailDao.create(self.mail_data)

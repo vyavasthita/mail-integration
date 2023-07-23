@@ -14,6 +14,7 @@ from src import create_log_directory
 from src.auth.auth import Auth
 from src.rule_engine.rule_parser import RuleParser
 from src.mail_engine.mail_engine import MailEngine
+from src.rule_engine.rule_validation import RuleValidation
 from src.rule_engine.rule_engine import RuleEngine
 from src.utils.api_logger import ApiLogger
 from src.data_layer.db_validation import check_db_connection
@@ -124,6 +125,10 @@ class CommandInterface:
 
 class MailHelper:
     def __init__(self) -> None:
+        self.rule_parser = None
+        self.rule_validation = None
+
+    def initialize(self):
         print("Creating log directory")
         create_log_directory()
 
@@ -131,13 +136,15 @@ class MailHelper:
             os.getcwd(), "config", environment, "email_rules.json"
         )
 
-        self.cli = CommandInterface()
         self.rule_parser = RuleParser(rule_file_path)
-
-    def initialize(self):
-        print("************************ Mail Helper CLI ************************")
-        init_credential_json()
         self.rule_parser.parse()
+        self.rule_validation = RuleValidation(self.rule_parser)
+
+        init_credential_json()
+
+    def init_cmd(self):
+        print("************************ Mail Helper CLI ************************")
+
         self.cli.initialize_cmd()
 
     def auth(self):
@@ -150,6 +157,8 @@ class MailHelper:
 
     @check_db_connection
     def validate(self):
+        # Validate rule parser data
+        self.rule_validation.verify_rules()
         print("All validations are done, please proceed.")
 
     def show_rules(self, rule: str):
@@ -180,10 +189,13 @@ class MailHelper:
         rule_engine.start(rule_data)
 
     def start(self):
+        self.initialize()
+        self.init_cmd()
+
         choice = self.cli.get_choice(self.rule_parser.get_available_rules())
 
-        if choice.option == ArgOption.VALIDATE:
-            self.validate()
+        self.validate()
+
         if choice.option == ArgOption.AUTH:
             self.auth()
         if choice.option == ArgOption.UNAUTH:
@@ -199,5 +211,5 @@ class MailHelper:
 if __name__ == "__main__":
     mail_helper = MailHelper()
 
-    mail_helper.initialize()
+    mail_helper.cli = CommandInterface()
     mail_helper.start()

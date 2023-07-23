@@ -10,7 +10,7 @@
                     "type": "str",
                     "code": 1,
                     "name": "contains",
-                    "value": "tenmiles.com"
+                    "value": "interviews"
                 }
             },
             {
@@ -20,7 +20,7 @@
                     "type": "str",
                     "code": 2,
                     "name": "Does not contain",
-                    "value": "www.amazon.com"
+                    "value": "gmail.com"
                 }
             },
             {
@@ -68,17 +68,19 @@
         ],
         "actions": [
             {
-                "type": "Move",
-                "action": {
-                    "name": "Move Message",
-                    "to mailbox": "Inbox"
-                }
+                "code": 1,
+                "name": "Move",
+                "label": "Inbox"
             },
             {
-                "type": "Read",
-                "action": {
-                    "name": "Mark as read"
-                }
+                "code": 2,
+                "name": "Read",
+                "label": "Unread"
+            },
+            {
+                "code": 3,
+                "name": "Unread",
+                "label": "Unread"
             }
         ]
     },
@@ -151,17 +153,42 @@
         ],
         "actions": [
             {
-                "type": "Move",
-                "action": {
-                    "name": "Move Message",
-                    "to mailbox": "Inbox"
-                }
+                "code": 1,
+                "name": "Move",
+                "label": "CATEGORY_PROMOTIONS"
             },
             {
-                "type": "Unread",
-                "action": {
-                    "name": "Mark as unread"
+                "code": 3,
+                "name": "Unread",
+                "label": "Unread"
+            }
+        ]
+    },
+    {
+        "rule": "rule_3",
+        "predicate": "any",
+        "conditions": [
+            {
+                "field": "From",
+                "code": 1,
+                "predicate": {
+                    "type": "str",
+                    "code": 1,
+                    "name": "contains",
+                    "value": "Google Accounts Team"
                 }
+            }
+        ],
+        "actions": [
+            {
+                "code": 1,
+                "name": "Move",
+                "label": "INBOX"
+            },
+            {
+                "code": 2,
+                "name": "Read",
+                "label": "Unread"
             }
         ]
     }

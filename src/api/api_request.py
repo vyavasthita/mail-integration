@@ -20,14 +20,16 @@ class ApiRequest:
             if data.code in [ActionCode.MOVE, ActionCode.UNREAD]:
                 add_labels.append(data.label)
             else:
-                remove_labels.append(data.label)
+                remove_labels.append("UNREAD")
 
         return add_labels, remove_labels
 
     def get_request_body(self, message_ids: list, action_data: List[ActionData]):
         ids = self.get_message_ids(message_ids)
         add_labels, remove_labels = self.get_labels(action_data)
-
+        print("******#############################*********")
+        print({"ids": ids, "addLabelIds": add_labels, "removeLabelIds": remove_labels})
+        print("******#############################*********")
         return {"ids": ids, "addLabelIds": add_labels, "removeLabelIds": remove_labels}
 
     def update_label(self, message_ids: list, action_data: List[ActionData]):

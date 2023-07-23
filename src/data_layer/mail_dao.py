@@ -20,7 +20,6 @@ class MailDao:
 
     @staticmethod
     def read(query):
-        ApiLogger.log_info("Read email data fromm database.")
         with DBConnection() as db_connection:
             db_connection.cursor.execute(query)
             return db_connection.cursor.fetchall()
