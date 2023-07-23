@@ -33,7 +33,8 @@ services:
       - mail-integration-qa
   backend-qa:
     build:
-      dockerfile: Dockerfile.qa
+      context: .
+      dockerfile: docker/Dockerfile.qa
     container_name: backend-qa
     ports:
       - 8181:8181

@@ -1,8 +1,39 @@
+"""Main file to start application.
+
+@file mail_helper.py
+@author Dilip Kumar Sharma
+@date 19 July 2023
+
+About; -
+--------
+    It is responsible for starting app.
+
+Design Pattern; -
+-----------------
+    TBD
+
+Working; -
+----------
+    This class uses implements arg parser to provide command line arguments.
+
+Uses; -
+-------
+    This module works as a starting point for our application.
+    This modules drives all other operations like validations, intialization, fetching emails and applying rules.
+
+Reference; -
+------------
+    TBD
+"""
+
+# Core python Packages
 import os
 import json
 import argparse
 from enum import IntEnum
 from dataclasses import dataclass
+
+# Application packages
 from src.initialize import (
     init_credential_json,
     create_ftsi,
@@ -30,6 +61,10 @@ class ArgOption(IntEnum):
 
 
 class CommandInterface:
+    """
+    Command line support for the application
+    """
+
     def __init__(self) -> None:
         self.parser = None
 
@@ -38,7 +73,10 @@ class CommandInterface:
         option: ArgOption = 1
         rule: str = None
 
-    def initialize_cmd(self):
+    def initialize_cmd(self) -> None:
+        """
+        To initialize arg parser
+        """
         self.parser = argparse.ArgumentParser(
             prog="mail_helper",
             description="List the cmd parameters for mail helper",
@@ -46,7 +84,13 @@ class CommandInterface:
             epilog="Thanks for using %(prog)s! :)",
         )
 
-    def read_arguments(self, available_rules: list):
+    def create_arguments(self, available_rules: list) -> None:
+        """
+        To create command line arguments.
+
+        Args:
+            available_rules (list): List of rules as defined in email_rules.json
+        """
         group = self.parser.add_mutually_exclusive_group()
 
         group.add_argument(
@@ -100,7 +144,16 @@ class CommandInterface:
         )
 
     def get_choice(self, available_rules: list) -> Choice:
-        self.read_arguments(available_rules=available_rules)
+        """
+        Get the choice selected by user in CMD.
+
+        Args:
+            available_rules (list): List of rules as defined in email_rules.json
+
+        Returns:
+            Choice: Choice selected by user
+        """
+        self.create_arguments(available_rules=available_rules)
 
         choice = CommandInterface.Choice()
         args = self.parser.parse_args()
@@ -128,7 +181,10 @@ class MailHelper:
         self.rule_parser = None
         self.rule_validation = None
 
-    def initialize(self):
+    def initialize(self) -> None:
+        """
+        Do all initialization related task.
+        """
         print("Creating log directory")
         create_log_directory()
 
@@ -137,32 +193,57 @@ class MailHelper:
         )
 
         self.rule_parser = RuleParser(rule_file_path)
-        self.rule_parser.parse()
+        self.rule_parser.parse()  # Parse email_rules.json file
         self.rule_validation = RuleValidation(self.rule_parser)
 
+        # Read gmail credentials from .env file and write them to a json file because
+        # gmail api uses .json file to read credentials.
         init_credential_json()
 
-    def init_cmd(self):
+    def init_cmd(self) -> None:
+        """
+        To initialize CMD parser.
+        """
         print("************************ Mail Helper CLI ************************")
 
         self.cli.initialize_cmd()
 
-    def auth(self):
+    def auth(self) -> None:
+        """
+        Trigger Authorization flow.
+        This creates a token.json file.
+        """
         auth = Auth()
         auth.start()
 
-    def un_auth(self):
+    def un_auth(self) -> None:
+        """
+        Triggers un authorization flow.
+        Delete token.json file.
+        This is marked as un authorization.
+        Next time we run the app to trigger authorization, auth flow will run again
+        and token.json file will be created.
+        """
         auth = Auth()
         auth.un_authenticate()
 
     @check_db_connection
-    def validate(self):
+    def validate(self) -> None:
+        """
+        Triggers all validations.
+        Like DB connection and validation related to email_rules.json file.
+        """
         # Validate rule parser data
         self.rule_validation.verify_rules()
         print("All validations are done, please proceed.")
 
-    def show_rules(self, rule: str):
-        ApiLogger.log_info(f"Show rule {rule}.")
+    def show_rules(self, rule: str) -> None:
+        """
+        To show rules available in email_rules.json file.
+        Args:
+            rule (str): Name of the rule from 'rule' attribute from email_rules.json file.
+        """
+        ApiLogger.log_info(f"Show rule '{rule}'.")
 
         if rule == "all":
             print(json.dumps(self.rule_parser.get_all(), indent=1))
@@ -171,27 +252,49 @@ class MailHelper:
 
     @check_db_connection
     @validate_auth
-    def start_mail_engine(self):
-        ApiLogger.log_debug("Starting mail engine.")
+    def start_mail_engine(self) -> None:
+        """
+        Triggers downloading emails, writing to database and creating full text search indexes.
+        Full text search indexes are created post inserting data into tables to improve performance.
+
+        Before triggering the flow, we validate we are connected to db and auth flow is completed.
+        """
+        ApiLogger.log_debug("Starting Mail Engine.")
 
         self.mail_engine = MailEngine()
         self.mail_engine.start()
 
+        ApiLogger.log_info("Creating full text search indexes.")
         create_ftsi()
 
     @check_db_connection
     @validate_auth
     @check_ftsi
-    def start_rule_engine(self, rule: str):
+    def start_rule_engine(self, rule: str) -> None:
+        """
+        Triggers applying email rules from email_rules.json.
+
+        Before triggering the flow, we validate we are connected to db, auth flow is completed
+        and full text search indexes are created.
+
+        Args:
+            rule (str): The selected rule to apply.
+        """
+        ApiLogger.log_debug("Starting Rule Engine.")
+
         rule_data = self.rule_parser.get_rule(rule)
         rule_engine = RuleEngine()
 
         rule_engine.start(rule_data)
 
-    def start(self):
+    def start(self) -> None:
+        """
+        Starting point for our application.
+        """
         self.initialize()
         self.init_cmd()
 
+        ApiLogger.log_info("Get the choice selected by user from command line.")
         choice = self.cli.get_choice(self.rule_parser.get_available_rules())
 
         self.validate()
