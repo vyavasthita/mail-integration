@@ -172,5 +172,8 @@ database/data
 database/development/data
 database/qa/data
 database/production/data
-
+configurations/*/.env*
 poetry.toml
+
+*.env.app
+*.env.test
