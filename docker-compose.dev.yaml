@@ -33,7 +33,8 @@ services:
       - mail-integration-development
   backend-development:
     build:
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: docker/Dockerfile.dev
     container_name: backend-development
     ports:
       - 8181:8181

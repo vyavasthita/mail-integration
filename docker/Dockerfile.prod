@@ -45,7 +45,7 @@ COPY ./configuration/production/email_rules.json /app/configuration/production/e
 COPY ./configuration/production/logging.conf /app/configuration/production/logging.conf
 
 COPY ./src /app/src
-COPY entrypoint.sh .
+COPY docker/entrypoint.sh .
 COPY mail_helper.py .
 
 # Copy files for unit tests

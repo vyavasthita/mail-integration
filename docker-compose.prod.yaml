@@ -33,7 +33,8 @@ services:
       - mail-integration-production
   backend-production:
     build:
-      dockerfile: Dockerfile.prod
+      context: .
+      dockerfile: docker/Dockerfile.production
     container_name: backend-production
     ports:
       - 8181:8181
