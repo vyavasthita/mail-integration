@@ -166,10 +166,8 @@ class MailReader:
             print("No messages were found.")
             return
 
-        #
         if os.path.exists("message_data.txt"):
             os.remove("message_data.txt")
-        #
 
         for message in messages:
             mail_field = MailField()
@@ -178,20 +176,6 @@ class MailReader:
 
             # Check if email is marked read by reading UNREAD label
             is_read = "UNREAD" not in mail_field.labels
-
-            #
-            # with open("message_data.txt", "a") as f:
-            #     f.write(f"Message Id: {mail_field.id}\n")
-            #     f.write(f"From: {mail_field.sender}\n")
-            #     f.write(f"To: {mail_field.receiver}\n")
-            #     f.write(f"Subject: {mail_field.subject}\n")
-            #     f.write(f"Date: {mail_field.date}\n")
-            #     f.write(f"Labels: {mail_field.labels}\n")
-            #     f.write(f"Message: {mail_field.body}\n")
-            #     f.write(
-            #         "***********************************************************************\n"
-            #     )
-            #
 
             db_data["email"].append((mail_field.id, is_read))
             # db_data["email_label"].append((mail_field.id, is_read))

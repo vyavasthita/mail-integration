@@ -54,7 +54,7 @@ class CommandInterface:
             "--validate",
             default=False,
             action="store_true",
-            help="To do baisc validiation like db connection is established.",
+            help="To do baisc validiation for db connection, rule parser validation etc.",
         )
 
         group.add_argument(

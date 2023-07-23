@@ -39,9 +39,6 @@ class DevelopmentConfig:
     API_URL = os.getenv("API_URL_DEV")
     REFRESH_TOKEN = os.getenv("REFRESH_TOKEN_DEV") or None
 
-    SCOPES_DEV = os.getenv("SCOPES_DEV")
-    SCOPES = SCOPES_DEV.split(", ")
-
     USER_ID = os.getenv("USER_ID_DEV")
 
     MYSQL_HOST = os.getenv("MYSQL_HOST_DEV")
