@@ -8,25 +8,13 @@ About; -
 --------
     It is responsible for starting app.
 
-Design Pattern; -
------------------
-    TBD
+    This class implements arg parser to provide command line arguments.
 
-Working; -
-----------
-    This class uses implements arg parser to provide command line arguments.
-
-Uses; -
--------
     This module works as a starting point for our application.
     This modules drives all other operations like validations, intialization, fetching emails and applying rules.
-
-Reference; -
-------------
-    TBD
 """
 
-# Core python Packages
+# Core python packages
 import os
 import json
 import argparse
@@ -42,13 +30,13 @@ from src.initialize import (
 )
 from src import environment
 from src import create_log_directory
-from src.auth.auth import Auth
 from src.rule_engine.rule_parser import RuleParser
 from src.mail_engine.mail_engine import MailEngine
 from src.rule_engine.rule_validation import RuleValidation
 from src.rule_engine.rule_engine import RuleEngine
 from src.utils.api_logger import ApiLogger
 from src.data_layer.db_validation import check_db_connection
+from src.initialize import auth, un_auth
 
 
 class ArgOption(IntEnum):
@@ -208,25 +196,6 @@ class MailHelper:
 
         self.cli.initialize_cmd()
 
-    def auth(self) -> None:
-        """
-        Trigger Authorization flow.
-        This creates a token.json file.
-        """
-        auth = Auth()
-        auth.start()
-
-    def un_auth(self) -> None:
-        """
-        Triggers un authorization flow.
-        Delete token.json file.
-        This is marked as un authorization.
-        Next time we run the app to trigger authorization, auth flow will run again
-        and token.json file will be created.
-        """
-        auth = Auth()
-        auth.un_authenticate()
-
     @check_db_connection
     def validate(self) -> None:
         """
@@ -300,9 +269,9 @@ class MailHelper:
         self.validate()
 
         if choice.option == ArgOption.AUTH:
-            self.auth()
+            auth()
         if choice.option == ArgOption.UNAUTH:
-            self.un_auth()
+            un_auth()
         elif choice.option == ArgOption.EMAIL:
             self.start_mail_engine()
         elif choice.option == ArgOption.SHOW_RULES:

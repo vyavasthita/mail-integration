@@ -1,6 +1,8 @@
+import sys
 from typing import List
 from dataclasses import dataclass, field
 from src.utils.json_reader import JsonReader
+from src.utils.api_logger import ApiLogger
 
 
 @dataclass
@@ -31,7 +33,11 @@ class AppConfigParser:
 
     def parse(self):
         json_reader = JsonReader(self.file_path)
-        self.data = json_reader.read()
+        try:
+            self.data = json_reader.read()
+        except ValueError as error:
+            ApiLogger.log_critical("Failed to parse App Config File. Exiting...")
+            sys.exit(0)
 
         api_config = ApiConfigData(
             token_file_path=self.data["api"]["token_file_path"],

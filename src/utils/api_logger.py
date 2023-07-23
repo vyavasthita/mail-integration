@@ -24,15 +24,14 @@ Uses; -
     Having single object for logging makes sure all log information are written to same log file.
 
     We initialize this singleton object at the beginning of running the application.
-
-Reference; -
-------------
-    TBD
 """
 
+# Core python packages
 import os
 import logging
 import logging.config
+
+# Application packages
 from src import env_configuration
 
 

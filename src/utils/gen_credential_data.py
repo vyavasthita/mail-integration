@@ -1,7 +1,27 @@
+"""To Initialize application.
+
+@file gen_credential_data.py
+@author Dilip Kumar Sharma
+@date 19 July 2023
+
+About; -
+--------
+    Read gmail credentials from .env file and write them to a json file because
+    gmail api uses .json file to read credentials.
+"""
+# Application packages
 from src.utils.api_logger import ApiLogger
 
 
-def gen_data(env_configuration):
+def gen_data(env_configuration) -> dict:
+    """Generate json from .env file
+
+    Args:
+        env_configuration (_type_): _description_
+
+    Returns:
+        dict: Generated dict object to be written to json file.
+    """
     ApiLogger.log_debug("Creating credential json data from environment variables.")
 
     data = dict()

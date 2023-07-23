@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass, field
 from src.utils.json_reader import JsonReader
 from src.utils.api_logger import ApiLogger
@@ -11,7 +12,12 @@ class RuleParser:
     def parse(self):
         ApiLogger.log_debug("Reading rule parsing json configuration.")
         json_reader = JsonReader(self.file_path)
-        self.data = json_reader.read()
+
+        try:
+            self.data = json_reader.read()
+        except ValueError as error:
+            ApiLogger.log_critical("Failed to parse App Config File. Exiting...")
+            sys.exit(0)
 
     def get_all(self):
         return self.data
