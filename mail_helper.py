@@ -133,7 +133,7 @@ class MailHelper:
         create_log_directory()
 
         rule_file_path = os.path.join(
-            os.getcwd(), "config", environment, "email_rules.json"
+            os.getcwd(), "configuration", environment, "email_rules.json"
         )
 
         self.rule_parser = RuleParser(rule_file_path)

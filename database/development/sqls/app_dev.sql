@@ -1,11 +1,9 @@
-CREATE DATABASE IF NOT EXISTS testingdb;
+CREATE DATABASE IF NOT EXISTS mails_development;
 
-use testingdb;
+use mails_development;
 
 CREATE USER IF NOT EXISTS 'local'@'localhost' IDENTIFIED BY 'local';
--- GRANT ALL PRIVILEGES ON testingdb.* TO 'local'@'localhost';
 GRANT ALL PRIVILEGES ON *.* TO 'local'@'localhost' WITH GRANT OPTION;
-
 FLUSH PRIVILEGES;
 
 CREATE TABLE IF NOT EXISTS label(  
@@ -78,7 +76,7 @@ BEGIN
 
     SELECT COUNT(1) INTO index_found
     FROM INFORMATION_SCHEMA.STATISTICS
-    WHERE table_schema = 'testingdb'
+    WHERE table_schema = 'mails_development'
     AND   table_name   = table_name
     AND   index_name   = column_name;
 
@@ -99,7 +97,7 @@ BEGIN
     IF is_found = 0 THEN
         ALTER TABLE email_sender ADD FULLTEXT(sender);
     ELSE
-        SELECT CONCAT('Index ','sender ','already exists on Table ', 'testingdb','.','email_sender');   
+        SELECT CONCAT('Index ','sender ','already exists on Table ', 'mails_development','.','email_sender');   
     END IF;
 
     -- Check index 'receiver' exists for table 'email_receiver'
@@ -108,7 +106,7 @@ BEGIN
     IF is_found = 0 THEN
          ALTER TABLE email_receiver ADD FULLTEXT(receiver);
     ELSE
-        SELECT CONCAT('Index ','receiver ','already exists on Table ', 'testingdb','.','email_receiver');   
+        SELECT CONCAT('Index ','receiver ','already exists on Table ', 'mails_development','.','email_receiver');   
     END IF;
 
     -- Check index 'subject' exists for table 'email_subject'
@@ -117,7 +115,7 @@ BEGIN
     IF is_found = 0 THEN
         ALTER TABLE email_subject ADD FULLTEXT(subject);
     ELSE
-        SELECT CONCAT('Index ','subject ','already exists on Table ', 'testingdb','.','email_subject');   
+        SELECT CONCAT('Index ','subject ','already exists on Table ', 'mails_development','.','email_subject');   
     END IF;
 
     -- Check index 'content' exists for table 'email_content'
@@ -126,7 +124,7 @@ BEGIN
     IF is_found = 0 THEN
         ALTER TABLE email_content ADD FULLTEXT(content);
     ELSE
-        SELECT CONCAT('Index ','content ','already exists on Table ', 'testingdb','.','email_content');   
+        SELECT CONCAT('Index ','content ','already exists on Table ', 'mails_development','.','email_content');   
     END IF;
     
 END $$

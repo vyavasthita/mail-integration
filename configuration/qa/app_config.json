@@ -1,0 +1,18 @@
+{
+    "api": {
+        "token_file_path": "token.json",
+        "host": "0.0.0.0",
+        "port": 8181,
+        "index_sp_name": "create_fti",
+        "scope": [
+            "https://www.googleapis.com/auth/gmail.readonly",
+            "https://www.googleapis.com/auth/gmail.modify"
+        ]
+    },
+    "message": {
+        "max_email_read": 10,
+        "labels": [
+            "INBOX"
+        ]
+    }
+}

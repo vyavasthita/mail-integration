@@ -169,5 +169,8 @@ credentials.json
 token.json
 
 database/data
+database/development/data
+database/qa/data
+database/production/data
 
 poetry.toml

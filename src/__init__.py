@@ -3,7 +3,8 @@ from src.config.env_config import config_by_name
 from src.config.app_config import AppConfigParser
 
 
-environment = os.getenv("BUILD_ENV") or "development"
+environment = os.getenv("BUILD_ENV")
+run_environment = os.getenv("RUN_ENV") or "app"
 
 
 def create_log_directory():
@@ -14,10 +15,10 @@ def create_log_directory():
 
 
 app_config_file_path = os.path.join(
-    os.getcwd(), "config", environment, "app_config.json"
+    os.getcwd(), "configuration", environment, "app_config.json"
 )
 
-env_configuration = config_by_name[environment]
+env_configuration = config_by_name[run_environment]
 
 app_config_parser = AppConfigParser(file_path=app_config_file_path)
 
