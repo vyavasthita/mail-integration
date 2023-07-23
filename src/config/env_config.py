@@ -1,14 +1,27 @@
+"""Environment variable configuration.
+
+@file env_config.py
+@author Dilip Kumar Sharma
+@date 20 July 2023
+
+About; -
+--------
+    To read application configuration from .env.* file.
+"""
+
+# Core python packages
 import os
 import sys
+
+# Third party packages
 from dotenv import load_dotenv
 
 
-build_environment = os.getenv("BUILD_ENV")
-run_environment = os.getenv("RUN_ENV") or "app"
+build_environment = os.getenv("BUILD_ENV")  # development, qa or production
+run_environment = os.getenv("RUN_ENV") or "app"  # application or unit tests
 
 # The root directory
 base_dir = os.path.abspath(os.path.dirname(__name__))
-
 build_environment_base_path = os.path.join(base_dir, "configuration", build_environment)
 
 
@@ -21,7 +34,6 @@ if run_environment not in env_by_name.keys():
     print(f"Invalid {run_environment}. Available Environments {env_by_name.keys()}")
     sys.exit(0)
 
-print("Using 'app' run_environment.")
 
 for environment_file in env_by_name.values():
     load_dotenv(dotenv_path=environment_file)

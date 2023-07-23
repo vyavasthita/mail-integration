@@ -1,5 +1,16 @@
+"""Action data from email_rules.json.
+
+@file action_data.py
+@author Dilip Kumar Sharma
+@date 22nd July 2023
+
+About; -
+--------
+    This module is represents actions defined in email_rules.json
+"""
+# Core python packages
 from dataclasses import dataclass
-from enum import Enum, IntEnum
+from enum import IntEnum
 
 
 class ActionCode(IntEnum):

@@ -1,4 +1,17 @@
+"""Validates database connection.
+
+@file mail_data_builder.py
+@author Dilip Kumar Sharma
+@date 20th July 2023
+
+About; -
+--------
+    Validates whether or not we are connected to database
+"""
+# Core python packages
 from dataclasses import dataclass, field
+
+# Application packages
 from src.mail_engine.mail_data import MailData
 from src.data_layer.mail_dao import MailDao
 
@@ -50,5 +63,8 @@ class MailDataBuilder:
         self.mail_data.append(MailData(add_date, self.data["date"]))
         self.mail_data.append(MailData(add_content, self.data["content"]))
 
-    def write_to_db(self):
+    def write_to_db(self) -> None:
+        """
+        Triggers writing data to db
+        """
         MailDao.create(self.mail_data)

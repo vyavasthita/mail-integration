@@ -1,6 +1,20 @@
+"""Application configuration.
+
+@file app_config.py
+@author Dilip Kumar Sharma
+@date 20 July 2023
+
+About; -
+--------
+    To read application configuration from app_config.json file.
+"""
+
+# Core python packages
 import sys
 from typing import List
 from dataclasses import dataclass, field
+
+# Application packages
 from src.utils.json_reader import JsonReader
 from src.utils.api_logger import ApiLogger
 
@@ -31,7 +45,13 @@ class AppConfigParser:
     file_path: str
     data: dict = None
 
-    def parse(self):
+    def parse(self) -> ApiConfigData:
+        """
+        Parse json file.
+
+        Returns:
+            ApiConfigData: Configuration data
+        """
         json_reader = JsonReader(self.file_path)
         try:
             self.data = json_reader.read()

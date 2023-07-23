@@ -34,7 +34,7 @@ services:
   backend-production:
     build:
       context: .
-      dockerfile: docker/Dockerfile.production
+      dockerfile: Dockerfile.prod
     container_name: backend-production
     ports:
       - 8181:8181

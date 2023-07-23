@@ -2,7 +2,7 @@
 
 @file mail_helper.py
 @author Dilip Kumar Sharma
-@date 19 July 2023
+@date 19th July 2023
 
 About; -
 --------
@@ -13,7 +13,6 @@ About; -
     This module works as a starting point for our application.
     This modules drives all other operations like validations, intialization, fetching emails and applying rules.
 """
-
 # Core python packages
 import os
 import json

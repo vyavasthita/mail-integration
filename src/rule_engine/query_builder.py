@@ -1,5 +1,20 @@
-# Ref: https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
+"""Generates query from email_rules.json
+
+@file query_builder.py
+@author Dilip Kumar Sharma
+@date 22nd July 2023
+
+About; -
+--------
+    This module is responsible for creating queries as per rules defined in email_rules.json.
+
+    Ref: https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
+"""
+# Core python packages
 from enum import Enum, IntEnum
+from datetime import datetime
+
+# Application packages
 from src.utils.datetime_helper import (
     get_today,
     subtract_days,
@@ -38,7 +53,16 @@ class QueryBuilder:
         LESS_THAN = 5
         GREATOR_THAN = 6
 
-    def gen_table_query_str(self, condition_code: int):
+    def get_table_info(self, condition_code: int) -> tuple:
+        """
+        Get table and column name based on the field in email_rules.json
+
+        Args:
+            condition_code (int): Code for given field
+
+        Returns:
+            tuple: table and column names
+        """
         table = str()
         column = str()
 
@@ -60,16 +84,40 @@ class QueryBuilder:
 
         return table, column
 
-    def gen_match_query_str(self, column: str, predicate_value: str):
+    def gen_match_query_str(self, column: str, predicate_value: str) -> str:
+        """
+        This method generates query for match part of string
+
+        Args:
+            column (str): Column of table for which query is being constructed.
+            predicate_value (str): Value of predicate which needs to be matched in database.
+
+        Returns:
+            str: _description_
+        """
         # MATCH (sender) AGAINST ('"Naukri"' IN BOOLEAN MODE)
         return f"MATCH ({column}) AGAINST ('\"{predicate_value}\"' IN BOOLEAN MODE)"
 
-    def get_date_duration(self, predicate_value: str, predicate_duration: str):
+    def get_date_duration(self, predicate_value: str, predicate_duration: str) -> None:
+        """
+        Generate duration between which date query needs to be executed.
+
+        Args:
+            predicate_value (str): Value of predicate which needs to be matched in database.
+            predicate_duration (str): Months or days
+        """
+
         return (
             predicate_value * 30 if predicate_duration == "months" else predicate_value
         )
 
-    def get_start_date(self, days_duration: str):
+    def get_start_date(self, days_duration: str) -> datetime:
+        """
+        Get start date starting which query needs to be executed.
+
+        Args:
+            days_duration (str): Months or days
+        """
         return change_format_from_datetime(
             subtract_days(get_today(), days_duration), "%Y-%m-%d"
         )
@@ -80,7 +128,19 @@ class QueryBuilder:
         predicate_code: int,
         predicate_value: str,
         predicate_duration: str,
-    ):
+    ) -> str:
+        """
+        Generate query for date field.
+
+        Args:
+            column (str): No table column on which date query is to be applied
+            predicate_code (int): Less than or greator than condition
+            predicate_value (str): Value of predicate which needs to be matched in database.
+            predicate_duration (str): Months or days
+
+        Returns:
+            str: _description_
+        """
         start_date = self.get_start_date(
             self.get_date_duration(predicate_value, predicate_duration)
         )
@@ -94,7 +154,17 @@ class QueryBuilder:
 
         return f"{column} {condition_operator} '{start_date}'"
 
-    def gen_str_field_query_str(self, column, condition_predicate: dict):
+    def gen_str_field_query_str(self, column: str, condition_predicate: dict) -> None:
+        """
+        Generate query string for 'Contains', 'Does not contain', 'Equals' and 'Does not equal'
+
+        Args:
+            column (str): Name of column on which query needs to be applied.
+            condition_predicate (dict): Details of condition for which query string to be generated.
+
+        Returns:
+            _type_: _description_
+        """
         predicate_code = condition_predicate["code"]
         predicate_value = condition_predicate["value"]
 
@@ -125,7 +195,27 @@ class QueryBuilder:
 
         return match_string
 
-    def gen_field_query_str(self, column: str, condition: dict):
+    def gen_field_query_str(self, column: str, condition: dict) -> str:
+        """
+        Generate query for single field.
+        {
+            "field": "From",
+            "code": 1,
+            "predicate": {
+                "type": "str",
+                "code": 1,
+                "name": "contains",
+                "value": "interviews"
+            }
+        }
+
+        Args:
+            column (str): Name of column of table on which query needs to be applied.
+            condition (dict): _description_
+
+        Returns:
+            str: Query string
+        """
         condition_predicate = condition["predicate"]
 
         if condition["code"] == QueryBuilder.Field.DATE_RECEIVED:
@@ -138,8 +228,27 @@ class QueryBuilder:
 
         return self.gen_str_field_query_str(column, condition_predicate)
 
-    def build_condition_query(self, condition):
-        table, column = self.gen_table_query_str(condition_code=condition["code"])
+    def build_condition_query(self, condition: dict) -> str:
+        """
+        Build query for a given condition.
+        {
+            "field": "From",
+            "code": 1,
+            "predicate": {
+                "type": "str",
+                "code": 1,
+                "name": "contains",
+                "value": "interviews"
+            }
+        }
+
+        Args:
+            condition (dict): Condition for which query needs to be generated.
+
+        Returns:
+            str: Query string
+        """
+        table, column = self.get_table_info(condition_code=condition["code"])
 
         return (
             "SELECT message_id FROM {}".format(table)
@@ -151,11 +260,25 @@ class QueryBuilder:
 
 
 class AllQueryBuilder(QueryBuilder):
-    def get_where_conditions(self, conditions: list):
+    def get_where_conditions(self, conditions: list) -> str:
+        """
+        Generates where conditions query.
+
+        MATCH(email_sender.sender) AGAINST('"interview"' IN BOOLEAN MODE)
+        AND MATCH(email_receiver.receiver) AGAINST('"gmail"' IN BOOLEAN MODE)
+        AND MATCH (email_subject.subject) AGAINST ('"sharma bharat"' IN BOOLEAN MODE)
+        AND LENGTH(subject) = LENGTH("sharma bharat");
+
+        Args:
+            conditions (list): List of conditions
+
+        Returns:
+            str: Query string
+        """
         query = str()
 
         for index, condition in enumerate(conditions):
-            table, column = self.gen_table_query_str(condition_code=condition["code"])
+            table, column = self.get_table_info(condition_code=condition["code"])
             query += self.gen_field_query_str(column, condition)
 
             if (
@@ -170,15 +293,25 @@ class AllQueryBuilder(QueryBuilder):
                 )
         return query
 
-    def gen_join_condition(self, conditions: list):
-        # JOIN email_receiver using (message_id)
-        # JOIN email_subject using (message_id)
+    def gen_join_condition(self, conditions: list) -> str:
+        """
+        Constructs query for join conditions
+
+        JOIN email_receiver using (message_id)
+        JOIN email_subject using (message_id)
+
+        Args:
+            conditions (list): Conditions for which query needs to be generated.
+
+        Returns:
+            str: Query string
+        """
         joining_column = "message_id"
         query = str()
         processed_conditions = set()
 
         for index, condition in enumerate(conditions):
-            table, column = self.gen_table_query_str(condition_code=condition["code"])
+            table, column = self.get_table_info(condition_code=condition["code"])
 
             if index == 0:
                 query = (
@@ -199,14 +332,25 @@ class AllQueryBuilder(QueryBuilder):
 
         return query
 
-    def build_all_predicate(self, conditions: list):
-        # SELECT email_sender.message_id,
-        # MATCH(email_sender.sender) AGAINST('+interviews') as sender,
-        # MATCH(email_receiver.receiver) AGAINST('+gmail.com') as receiver
-        # FROM email_sender
-        # LEFT JOIN email_receiver ON email_sender.message_id = email_receiver.message_id
-        # WHERE
-        # MATCH(email_sender.sender) AGAINST('+interviews');
+    def build_all_predicate(self, conditions: list) -> str:
+        """
+        Generate the complete query for 'All' predicate.
+
+        SELECT email_sender.message_id,
+        MATCH(email_sender.sender) AGAINST('+interviews') as sender,
+        MATCH(email_receiver.receiver) AGAINST('+gmail.com') as receiver
+        FROM email_sender
+        LEFT JOIN email_receiver ON email_sender.message_id = email_receiver.message_id
+        WHERE
+        MATCH(email_sender.sender) AGAINST('+interviews');
+
+        Args:
+            conditions (list): Conditions for which query needs to be generated.
+
+        Returns:
+            str: Query string
+        """
+
         return (
             self.gen_join_condition(conditions)
             + "WHERE"
@@ -218,7 +362,28 @@ class AllQueryBuilder(QueryBuilder):
 
 
 class AnyQueryBuilder(QueryBuilder):
-    def build_any_predicate(self, conditions):
+    def build_any_predicate(self, conditions: dict) -> str:
+        """
+        Generate the complete query for 'Any' predicate.
+
+        SELECT message_id FROM email_sender WHERE MATCH (sender) AGAINST ('+tenmiles.com' IN BOOLEAN MODE)
+        UNION
+        SELECT message_id FROM email_receiver WHERE receiver = 'www.amazon.com'
+        UNION
+        SELECT message_id FROM email_subject WHERE MATCH (subject) AGAINST ('-Interview' IN BOOLEAN MODE)
+        UNION
+        SELECT message_id FROM email_content WHERE content != 'Scheduled'
+        UNION
+        SELECT message_id FROM email_date WHERE (received BETWEEN '2023-06-20' AND '2023-07-20')
+        UNION
+        SELECT message_id FROM email_date WHERE (received BETWEEN '2023-07-20' AND '2023-07-31');
+            
+        Args:
+            conditions (dict): Conditions for which query needs to be generated.
+
+        Returns:
+            str: Query string
+        """
         cumulative_query = str()
 
         for index, condition in enumerate(conditions):

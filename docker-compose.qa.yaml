@@ -34,7 +34,7 @@ services:
   backend-qa:
     build:
       context: .
-      dockerfile: docker/Dockerfile.qa
+      dockerfile: Dockerfile.qa
     container_name: backend-qa
     ports:
       - 8181:8181

@@ -1,8 +1,25 @@
+"""Read gmail data using gmail api.
+
+@file mail_reader.py
+@author Dilip Kumar Sharma
+@date 19th July 2023
+
+About; -
+--------
+    This module is responsible for talking to gmail api and
+    fetching messesses metadata and parsing them.
+"""
+
+# Core python packages
 import os.path
 import base64
 from typing import List
 from dataclasses import dataclass, field
+
+# Third party packages
 from googleapiclient.errors import HttpError
+
+# Application packages
 from src import env_configuration, app_configuration
 from src.auth.gmail_auth import GmailAuth
 from src.utils.api_logger import ApiLogger
@@ -28,9 +45,14 @@ class MailField:
 class MailParser:
     connection: GmailAuth = field(default_factory=GmailAuth)
 
-    def parse_msg_attributes(self, headers: dict, mail_field: MailField):
-        # payload dictionary contains ‘headers‘, ‘parts‘, ‘filename‘ etc.
-        # So, we can now easily find headers such as sender, subject, etc. from here.
+    def parse_msg_attributes(self, headers: dict, mail_field: MailField) -> None:
+        """To parse msg attributes.
+            payload dictionary contains ‘headers‘, ‘parts‘, ‘filename‘ etc.
+            So, we can now easily find headers such as sender, subject, etc. from here.
+        Args:
+            headers (dict): _description_
+            mail_field (MailField): _description_
+        """
         for header in headers:
             if header["name"] == "From":
                 mail_field.sender = header["value"]
@@ -48,7 +70,14 @@ class MailParser:
                     dt=dt, date_format="%Y-%m-%d"
                 )
 
-    def parse_body(self, parts, mail_field: MailField):
+    def parse_body(self, parts: list, mail_field: MailField) -> None:
+        """
+        To parse message body.
+
+        Args:
+            parts (list): List of data having messages in parts.
+            mail_field (MailField): out data to be consumed later.
+        """
         body_message = None
 
         # Get the data and decode it with base 64 decoder.
@@ -86,7 +115,14 @@ class MailReader:
     connection: GmailAuth = field(default_factory=GmailAuth)
     mail_parser: MailParser = MailParser(connection)
 
-    def get_detail(self, message, mail_field: MailField):
+    def get_detail(self, message: dict, mail_field: MailField) -> None:
+        """
+        Get metadata of single message by calling gmail api.
+
+        Args:
+            message (dict): message for which metadata needs to be fetched.
+            mail_field (MailField): Out data to be consumed later.
+        """
         try:
             # Get the message from its id
             email_data = (
@@ -126,7 +162,7 @@ class MailReader:
         except HttpError as error:
             print(f"Error occurred while parsing email message. {str(error)}")
 
-    def fetch(self):
+    def fetch(self) -> None:
         """
         Once connected, we will request a list of messages.
 
@@ -157,17 +193,20 @@ class MailReader:
                 )
             )
 
-    def read(self, db_data: dict):
+    def read(self, db_data: dict) -> None:
+        """
+        Read gmail data
+
+        Args:
+            db_data (dict): Out data in which we store gmail data.
+        """
         ApiLogger.log_info("Reading emails from gmail")
         # messages is a list of dictionaries where each dictionary contains a message id
         messages = self.fetch()
 
         if not messages:
-            print("No messages were found.")
+            ApiLogger.log_warning("No messages were found in gmail.")
             return
-
-        if os.path.exists("message_data.txt"):
-            os.remove("message_data.txt")
 
         for message in messages:
             mail_field = MailField()
@@ -192,7 +231,10 @@ class MailReader:
 class LabelReader:
     connection: GmailAuth = field(default_factory=GmailAuth)
 
-    def fetch_labels(self):
+    def fetch_labels(self) -> None:
+        """
+        Fetch label metadata from gmail
+        """
         try:
             results = (
                 self.connection.service.users()
@@ -202,18 +244,18 @@ class LabelReader:
             )
             return results.get("labels", [])
         except HttpError as error:
-            print(
+            ApiLogger.log_error(
                 "Error response status code : {0}, reason : {1}".format(
                     error.status_code, error.error_details
                 )
             )
 
-    def parse(self, label_data: list):
+    def parse(self, label_data: list) -> None:
         # labels is a list of dictionaries where each dictionary contains a label id
         labels = self.fetch_labels()
 
         if not labels:
-            print("No labels were found.")
+            ApiLogger.log_warning("No labels were found in gmail.")
             return
 
         for label in labels:

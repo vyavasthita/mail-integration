@@ -14,7 +14,6 @@ import os
 
 # Application packages
 from src.config.env_config import config_by_name
-from src.config.app_config import AppConfigParser
 
 
 environment = os.getenv("BUILD_ENV")  # development or qa or production
@@ -39,6 +38,8 @@ app_config_file_path = os.path.join(
 # get environment for app run or running unit tests
 env_configuration = config_by_name[run_environment]
 
-app_config_parser = AppConfigParser(file_path=app_config_file_path)
+# Importing at the bottom to avoid circular import error
+from src.config.app_config import AppConfigParser
 
+app_config_parser = AppConfigParser(file_path=app_config_file_path)
 app_configuration = app_config_parser.parse()

@@ -1,6 +1,23 @@
+"""To connect to database.
+
+@file db_cpnnection.py
+@author Dilip Kumar Sharma
+@date 19th July 2023
+
+About; -
+--------
+    It connects with mysql database using python mysql connector
+"""
+
+# Core python packages
 import sys
+
+# Third party packages
 from mysql.connector import connect, Error, errorcode
+
+# Application packages
 from src import env_configuration
+from src.utils.api_logger import ApiLogger
 
 
 class DBConnection:
@@ -13,30 +30,35 @@ class DBConnection:
         "autocommit": True,
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         try:
             self.connection = connect(**DBConnection.config)
             self.cursor = self.connection.cursor()
-            print(
+            ApiLogger.log_info(
                 f"User '{self.connection.user}' is connected to '{self.connection.database}' database."
             )
         except Error as error:
             if error.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Something is wrong with your user name or password")
+                ApiLogger.log_critical(
+                    "Something is wrong with your user name or password"
+                )
             elif error.errno == errorcode.ER_BAD_DB_ERROR:
-                print("Database does not exist")
+                ApiLogger.log_critical("Database does not exist")
             else:
-                print(str(error))
+                ApiLogger.log_critical(str(error))
 
-            print("We are not connected to databse. exiting.")
+            ApiLogger.log_critical("We are not connected to databse. Exiting...")
             sys.exit(0)
         except Exception as error:
-            print(str(error))
+            ApiLogger.log_critical(
+                f"Failed to connect to database. {str(error)} Exiting..."
+            )
+            sys.exit(0)
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         if self.connection.is_connected():
             self.cursor.close()
             # close db connection
