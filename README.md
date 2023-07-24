@@ -663,7 +663,7 @@ Note: Be careful before you clean containers
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-## :large_blue_cnut_and_boltircle: QA Build Environment
+## :gem: QA Build Environment
 - To run project in QA environment, you need to configure environment variables and configuration files
 
 - Steps are similar to development environment mentioned above.
@@ -679,6 +679,27 @@ configuration/qa
    Set following environment variable.
    ```sh
    export BUILD_ENV=qa
+   ```
+   #### :pencil: Default build environment is 'development' and hence if we do not set BUILD_ENV variable, we will be treated in development environment.
+
+Starting application and running unit tests commands are same as development environment.
+
+## :gem: production Build Environment
+- To run project in production environment, you need to configure environment variables and configuration files
+
+- Steps are similar to development environment mentioned above.
+Only thing to be done is update the configuration for production environment in below path.
+
+```
+configuration/production
+```
+
+- Update .env.app and .env.qa as done in development environment
+
+- Set BUILD_ENV
+   Set following environment variable.
+   ```sh
+   export BUILD_ENV=production
    ```
    #### :pencil: Default build environment is 'development' and hence if we do not set BUILD_ENV variable, we will be treated in development environment.
 
