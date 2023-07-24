@@ -1,0 +1,6 @@
+field_code,table_name,column
+1,email_sender,sender
+2,email_receiver,receiver
+3,email_subject,subject
+4,email_content,content
+5,email_date,received
