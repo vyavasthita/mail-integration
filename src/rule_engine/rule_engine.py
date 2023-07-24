@@ -20,6 +20,7 @@ from src.utils.api_logger import ApiLogger
 from src.data_layer.mail_dao import MailDao
 from src.api.api_request import ApiRequest
 from src.api.http_status import HttpStatus
+from src.utils.datetime_helper import timer
 
 
 @dataclass
@@ -75,6 +76,7 @@ class RuleEngine:
 
         return query
 
+    @timer
     def start(self, selected_rule_data: dict) -> None:
         """
         Triggers applying rules.

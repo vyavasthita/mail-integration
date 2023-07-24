@@ -14,6 +14,7 @@ from src.auth.gmail_auth import GmailConnection
 from src.mail_engine.mail_reader import MailReader, LabelReader
 from src.mail_engine.mail_data_builder import MailDataBuilder
 from src.utils.api_logger import ApiLogger
+from src.utils.datetime_helper import timer
 
 
 class MailEngine:
@@ -35,6 +36,7 @@ class MailEngine:
         self.data["content"] = list()
         self.data["date"] = list()
 
+    @timer
     def start(self) -> None:
         """
         It reads mail data and drives writing data to db.

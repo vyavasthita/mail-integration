@@ -18,6 +18,7 @@ from src import env_configuration
 from src.rule_engine.action_data import ActionData, ActionCode
 from src.auth.connection import AuthConnection
 from src.utils.api_logger import ApiLogger
+from src.utils.datetime_helper import timer
 
 
 @dataclass
@@ -63,6 +64,7 @@ class ApiRequest:
         add_labels, remove_labels = self.get_labels(action_data)
         return {"ids": ids, "addLabelIds": add_labels, "removeLabelIds": remove_labels}
 
+    @timer
     def update_label(self, message_ids: list, action_data: List[ActionData]) -> None:
         """
         Call Rest api to update label of messages.
