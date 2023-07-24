@@ -23,8 +23,6 @@ def db_connection():
 
 @pytest.fixture
 def set_up_test_data_1(db_connection):
-    create_ftsi()
-
     add_email = """
         INSERT INTO email(message_id, is_read) value(%s, %s) ON DUPLICATE KEY UPDATE is_read = is_read
     """
@@ -102,6 +100,7 @@ def set_up_test_data_1(db_connection):
 
     db_connection.commit()
 
+    create_ftsi()
 
 
 @pytest.fixture

@@ -60,7 +60,8 @@ Softwares/libraries used in this project.
 - Python 3.10
 
 ### Assumptions
-- We can have multiple rules defined in json file.
+- We can not have multiple rules (with same field) defined in json file.
+  E.g. we can not have two 'From' fields in our json rules.
   But at a time we can run only one rule.
 - Every time we run the script to fetch the emails, we download the all requested emails
   and update/overwrite the date if email is duplicate.

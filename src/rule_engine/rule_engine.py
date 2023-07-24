@@ -67,7 +67,8 @@ class RuleEngine:
         )
 
         ApiLogger.log_info("Generated query.")
-        ApiLogger.log_info(query)
+        ApiLogger.log_info(f"\n*********************************************\n{query}")
+        print("*********************************************")
 
         ApiLogger.log_info("Building actions")
         self.build_actions(selected_rule_data["actions"])
@@ -95,7 +96,7 @@ class RuleEngine:
         api_request = ApiRequest()
         status = api_request.update_label(result_set, self.action_data)
 
-        if status == HttpStatus.HTTP_204_NO_CONTENT:
+        if status == HttpStatus.HTTP_200_OK or status == HttpStatus.HTTP_204_NO_CONTENT:
             ApiLogger.log_info("Labels updated successfully")
         elif status == HttpStatus.HTTP_400_BAD_REQUEST:
             ApiLogger.log_error("Failed to update labels. Bad request.")

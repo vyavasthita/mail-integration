@@ -35,18 +35,32 @@ def test_any_predicate(db_connection, set_up_test_data_1, today_date, conditions
 
     expected_query = """SELECT message_id FROM email_subject WHERE NOT MATCH (subject) AGAINST ('"scheduled"' IN BOOLEAN MODE)
 UNION
-SELECT message_id FROM email_date WHERE received > '{}';""".format(subtracted_date)
+SELECT message_id FROM email_date WHERE received > '{}';""".format(
+        subtracted_date
+    )
 
     assert query == expected_query
 
+    # now fetch records from db
+    cursor = db_connection.cursor()
+    cursor.execute(query)
+    result_set = cursor.fetchall()
+
+    assert set([result[0] for result in result_set]) == set(
+        [
+            "message_id_2",
+            "message_id_3",
+            "message_id_4",
+        ]
+    )
+
     # truncate date post verification
-    # db_connection.start_transaction()
-    # db_connection.cursor().execute("SET foreign_key_checks = 0")
-    # db_connection.cursor().execute("TRUNCATE TABLE email_sender")
-    # db_connection.cursor().execute("TRUNCATE TABLE email_receiver")
-    # db_connection.cursor().execute("TRUNCATE TABLE email_subject")
-    # db_connection.cursor().execute("TRUNCATE TABLE email_content")
-    # db_connection.cursor().execute("TRUNCATE TABLE email_date")
-    # db_connection.cursor().execute("TRUNCATE TABLE email")
-    # db_connection.cursor().execute("SET foreign_key_checks = 1")
-    # db_connection.commit()
+    db_connection.cursor().execute("SET foreign_key_checks = 0")
+    db_connection.cursor().execute("TRUNCATE TABLE email_sender")
+    db_connection.cursor().execute("TRUNCATE TABLE email_receiver")
+    db_connection.cursor().execute("TRUNCATE TABLE email_subject")
+    db_connection.cursor().execute("TRUNCATE TABLE email_content")
+    db_connection.cursor().execute("TRUNCATE TABLE email_date")
+    db_connection.cursor().execute("TRUNCATE TABLE email")
+    db_connection.cursor().execute("SET foreign_key_checks = 1")
+    db_connection.commit()

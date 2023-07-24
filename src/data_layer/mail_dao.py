@@ -12,6 +12,9 @@ About; -
 # Core python packages
 from typing import List
 
+# Third party packages
+from mysql.connector import Error
+
 # Application packages
 from src.data_layer.db_connection import DBConnection
 from src.mail_engine.mail_data import MailData
@@ -31,10 +34,13 @@ class MailDao:
         with DBConnection() as db_connection:
             db_connection.connection.start_transaction()
 
-            for mail_data in mails_data:
-                db_connection.cursor.executemany(
-                    mail_data.query_string, mail_data.query_data
-                )
+            try:
+                for mail_data in mails_data:
+                    db_connection.cursor.executemany(
+                        mail_data.query_string, mail_data.query_data
+                    )
+            except Error as error:
+                ApiLogger.log_error(f"Failed to write data to database. {str(error)}")
 
             db_connection.connection.commit()  # commit changes
 
@@ -47,5 +53,8 @@ class MailDao:
             query (str): query to be executed to fetch records
         """
         with DBConnection() as db_connection:
-            db_connection.cursor.execute(query)
-            return db_connection.cursor.fetchall()
+            try:
+                db_connection.cursor.execute(query)
+                return db_connection.cursor.fetchall()
+            except Error as error:
+                ApiLogger.log_error(f"Failed to read data from database. {str(error)}")
