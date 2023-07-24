@@ -43,34 +43,67 @@ Softwares/libraries used in this project.
 * [![Python][Python]][Python-url]
 * [![Docker][Docker]][Docker-url]
 * [![Docker Compose][Docker]][Docker-Compose-url]
-* [![Makefile][Makefile]][Make-url]
+* [![Makefile][Makefile]][Makefile-url]
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ## :hammer: Testing
-### Platform/Software
-1. OS - Ubuntu 22.04
-2. Docker Compose version v2.17.3
-3. Docker version 23.0.6
-4. Mysql 8.0.29
-5. Python 3.10
+### System Environment
+- OS - Ubuntu 22.04
+- Docker Compose version v2.17.3
+- Docker version 23.0.6
+- Mysql 8.0.29
+- Python 3.10
+
+### Assumptions
+- Same email rule can be duplicated.
 
 ### Scope
 - Tested with english language search only.
 - Tested without special characters search.
 - Tested against Mysql InnoDB engine only.
-
-### Assumptions
-- Same email rule can be duplicated.
-
-### Testing
 - This app is tested on Ubuntu 22.04 LTS.
 - Automated unit tests have been written using pytest.
 - Automated Unit test coverage is 0%.
 
+### :pencil: Notes
+Application is tested with root user of mysql db.
+
 ### Validations done
 If invalid rule is provided in rule parser json file then application will exit.
 01. Not connected to database
+
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
+
+## Design Goals
+### Independent Components
+Application should be divided into multiple small components which do one particular task.
+
+### Simplicity
+Source code and Database table structure should be less complex or say should be simple to understand.
+
+### Design Patterns
+Single Responsibility design pattern of SOLID principle is followed.
+Singletone design pattern is followed.
+
+### Scalable
+
+### Flexible
+Ability of the application to adapt and evolve to accommodate new requirements without affecting the existing operations. 
+Flexibility in the application can be achieved by; -
+    • Use of Gang of Four design patterns.
+    • Use of SOLID principle of design patterns.
+    • Use of object-oriented programming principles.
+    • Designing database tables.
+
+### Readable and Understandable
+Software is meant for modification/improvements. Fellow developers should be able to understand the code.
+This could be achieved by; -
+    • Coding guidelines.
+    • Comments/Description of classes and methods used.
+    • Documentation (Doc string comments in Python), README document.
+
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ## :dart: Features
 1. Mail Engine
@@ -95,37 +128,49 @@ If email script is run again, it will update the database.
 ## :art: Best Practices
 
 #### :white_check_mark: Use of context manager for db connection, gmail authentication
+#### :white_check_mark: Poetry for managing different environments
+#### :white_check_mark: Normalized DB Schema with Full text search index for pattern matching
+#### :white_check_mark: Python Logging - Console and File with proper log level
+#### :white_check_mark: Use of exception handling
+#### :white_check_mark: Doc string added for all modules and methods
+#### :white_check_mark: Type annotations are added for all methods.
+#### :white_check_mark: Docker with docker compose used.
+#### :white_check_mark: Use of environment variables.
+#### :white_check_mark: DB transactions are used while inserting data into database support Atomicity.
+#### :white_check_mark: Unit tests with coverage report
+#### :white_check_mark: Detailed README file.
+#### :white_check_mark: Proper git commit messages. Every commit is done post completing a functionality.
+#### :white_check_mark: Pep8 naming convention for modules, classes, methods, functions and variables.
+#### :white_check_mark: Comments added wherever required.
+#### :white_check_mark: Use of decorators, dataclasses.
+#### :white_check_mark: Python Logging
+#### :white_check_mark: Use of Makefile to each in using the application.
+#### :white_check_mark: Manual steps are minimal while testing the app.
+#### :white_check_mark: Proper directory and file structure of source code.
+#### :white_check_mark: Import statements are in order.
+#### :white_check_mark: Python core -> Third party -> Application modules
+#### :white_check_mark: Different configurations for differnent environments like Dev, test, QA, Production.
 
-- Use of context manager for db connection, gmail authentication
-- Poetry for managing different environments
-- Normalized DB Schema with Full text search index for pattern matching
-- Python Logging - Console and File with proper log level
-- Use of exception handling
-- Doc string added for all modules and methods
-- Type annotations are added for all methods.
-- Docker with docker compose used.
-- Use of environment variables.
-- Unit tests with coverage report
-- Detailed README file.
-- Proper git commit messages. Every commit is done post completing a functionality.
-- Pep8 naming convention for modules, classes, methods, functions and variables.
-- Comments added wherever required.
-- Use of decorators, dataclasses.
-    Python Logging
-- Use of Makefile to each in using the application.
-- Manual steps are minimal while testing the app.
-- Proper directory and file structure of source code.
-- Import statements are in order.
-    - Python core -> flask -> flask third party -> application modules
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-    Also related modules are imported in order.
-- Different configurations for differnent environments like Dev, test, QA, Production.
+## Issues and Improvements
+### Known issues
+- If you switch build environments from developement to qa etc, then;-
+  Stop the containers
+  Clean the containers
+  Start the containers
+  While parsing emails, only the message snippet is used not the complete body. 
+  This snippet is only the first 200 characters from the message body. 
+  Due to this some of the emails may not get filtered where field type is 'message'.
+  This limitation is due to the fact that message body may content images, htmls, text with any such combination.
+  Understanding this required more time and hence I did not implement this feature.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ## :large_orange_diamond: Technical Details
 
 ### Python Packages
+```
 Name: python-dotenv
 Purpose: To read environment variables from .env files
 Environment: All (development, qa, production etc.)
@@ -177,8 +222,12 @@ Environment: All (development, qa, production etc.)
 Name: requests
 Purpose: Restapi using requests
 Environment: All (development, qa, production etc.)
+```
+
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ### DB Schema
+```
 CREATE TABLE IF NOT EXISTS label(  
     label_id varchar(25) NOT NULL,  
     name varchar(45) NOT NULL,  
@@ -240,6 +289,8 @@ email_date(
     INDEX (received),
     FOREIGN KEY (message_id) REFERENCES email(message_id)
 );
+```
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ### Source Code Folder Structure
 
@@ -347,13 +398,6 @@ email_date(
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-## Issues and Improvements
-### Known issues
-- If you switch build environments from developement to qa etc, then;-
-  Stop the containers
-  Clean the containers
-  Start the containers
-
 <!-- Getting Started -->
 # 	:toolbox: Getting Started
 
@@ -382,6 +426,8 @@ Follow below steps to install the app.
     https://developers.google.com/gmail/api/quickstart/python
     ```
 
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
+
 <!-- Installation -->
 ## :gear: Installation
 
@@ -408,7 +454,6 @@ Choose one the below build environments for testing;-
 Steps are similar for all the environments.
 
 ## :large_blue_circle: Development Build Environment
-
 <!-- Env Variables -->
 ### :key: Environment Variables and Configuration
 
@@ -419,13 +464,13 @@ To run this project, you need to configure environment variables and configurati
    ```sh
    export BUILD_ENV=development
    ```
-   :pencil: Default build environment is 'development' and hence if we do not set BUILD_ENV variable,
-   we will be treated in development environment.
+   #### :pencil: Default build environment is 'development' and hence if we do not set BUILD_ENV variable, we will be treated in development environment.
 
 2. Go to directory 'configuration/development'
    ```sh
    cd configuration/development
    ```
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 3. Create .env files
     In this directory you will find two sample env files named '.env.app.sample' and '.env.test.sample'.
@@ -451,6 +496,8 @@ To run this project, you need to configure environment variables and configurati
     ```
     Note: `MYSQL_PASSWORD_TEST` value is empty and its intentional. Keep `MYSQL_PASSWORD_TEST` blank only.
     
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
+
 4. Update .env files
     - Update '.env.app' and '.env.test' files.
     
@@ -543,7 +590,7 @@ To run this project, you need to configure environment variables and configurati
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 <!-- Run -->
-## :running: Run Application
+### :running: Run Application
 
 Now you are ready to start the application
 
@@ -567,7 +614,7 @@ This will start 3 docker containers.
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
     
 <!-- Running Tests -->
-## :test_tube: Running Tests
+### :test_tube: Running Tests
 
 To run tests, run the following command
 
@@ -578,7 +625,7 @@ To run tests, run the following command
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 <!-- Tests Coverage -->
-## :test_tube: Unit Test Coverage
+### :test_tube: Unit Test Coverage
 
 To run tests, run the following command
 
@@ -588,7 +635,7 @@ To run tests, run the following command
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 <!-- Stop containers -->
-## :test_tube: Stop Containers
+### :test_tube: Stop Containers
 
 To stop all running containers, run the following command
 
@@ -599,7 +646,7 @@ To stop all running containers, run the following command
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 <!-- Clean containers -->
-## :test_tube: Clean Containers
+### :test_tube: Clean Containers
 
 To clean all running containers, run the following command
 
@@ -607,7 +654,7 @@ To clean all running containers, run the following command
   make clean
 ```
 
-It will fun following commands
+It will run following commands
 	docker network prune -f
 	docker container prune -f
 	docker image prune -f
@@ -615,6 +662,27 @@ It will fun following commands
 Note: Be careful before you clean containers
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
+
+## :large_blue_cnut_and_boltircle: QA Build Environment
+- To run project in QA environment, you need to configure environment variables and configuration files
+
+- Steps are similar to development environment mentioned above.
+Only thing to be done is update the configuration for qa environment in below path.
+
+```
+configuration/qa
+```
+
+- Update .env.app and .env.qa as done in development environment
+
+- Set BUILD_ENV
+   Set following environment variable.
+   ```sh
+   export BUILD_ENV=qa
+   ```
+   #### :pencil: Default build environment is 'development' and hence if we do not set BUILD_ENV variable, we will be treated in development environment.
+
+Starting application and running unit tests commands are same as development environment.
 
 <!-- Deployment -->
 # :triangular_flag_on_post: Deployment
@@ -640,7 +708,9 @@ It has some limitations;-
 - [x] Full text indexes are created post insertions for performance reasons.
     Some words which are not searched.
         Ref: https://dev.mysql.com/doc/refman/8.1/en/fulltext-stopwords.html
+    
     All searches/filtering are case-insensitive fashion.
+    
     Full text search have minimum len of char..
         Ref: https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
 
@@ -654,6 +724,7 @@ Searching/contains with special characters not tested.
 10. Use some profiling tools to check performance
 
 11. Use sphinx documentation
+Validating json files.
 
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
@@ -684,7 +755,7 @@ TBD
 [forks-url]: https://github.com/vyavasthita/mail-integration/network/members
 [stars-shield]: https://img.shields.io/badge/-stars-yellow?logo=github&logoColor=white&style=for-the-badge
 [stars-url]: https://github.com/vyavasthita/mail-integration/stargazers
-[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/badge/-license-blue?logo=license&logoColor=white&style=for-the-badge
 [license-url]: https://github.com/vyavasthita/mail-integration/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/diliplakshya/
