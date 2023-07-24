@@ -1,6 +1,6 @@
 <a name="readme-top"></a>
 
-[![Contributors][contributors-shield]][contributors-url]
+<!-- [![Contributors][contributors-shield]][contributors-url] -->
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![License][license-shield]][license-url]
@@ -38,15 +38,16 @@ Details:
 
 ## Built With
 
-Major softwares/libraries used in this project.
+Softwares/libraries used in this project.
 
 * [![Python][Python]][Python-url]
 * [![Docker][Docker]][Docker-url]
 * [![Docker Compose][Docker]][Docker-Compose-url]
+* [![Makefile][Makefile]][Make-url]
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-## Testing
+## :hammer: Testing
 ### Platform/Software
 1. OS - Ubuntu 22.04
 2. Docker Compose version v2.17.3
@@ -91,7 +92,10 @@ If email script is run again, it will update the database.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-## :dart: Best Practices
+## :art: Best Practices
+
+#### :white_check_mark: Use of context manager for db connection, gmail authentication
+
 - Use of context manager for db connection, gmail authentication
 - Poetry for managing different environments
 - Normalized DB Schema with Full text search index for pattern matching
@@ -119,8 +123,7 @@ If email script is run again, it will update the database.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-
-## Technical Details
+## :large_orange_diamond: Technical Details
 
 ### Python Packages
 Name: python-dotenv
@@ -416,7 +419,7 @@ To run this project, you need to configure environment variables and configurati
    ```sh
    export BUILD_ENV=development
    ```
-   Note: Default build environment is 'development' and hence if we do not set BUILD_ENV variable,
+   :pencil: Default build environment is 'development' and hence if we do not set BUILD_ENV variable,
    we will be treated in development environment.
 
 2. Go to directory 'configuration/development'
@@ -675,9 +678,11 @@ TBD
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-
+[contributors-shield]: https://img.shields.io/badge/-contributors-red?logo=github&logoColor=white&style=for-the-badge
 [contributors-url]: https://github.com/vyavasthita/grhakarya/graphs/contributors
+[forks-shield]: https://img.shields.io/badge/-forks-pink?logo=github&logoColor=white&style=for-the-badge
 [forks-url]: https://github.com/vyavasthita/mail-integration/network/members
+[stars-shield]: https://img.shields.io/badge/-stars-yellow?logo=github&logoColor=white&style=for-the-badge
 [stars-url]: https://github.com/vyavasthita/mail-integration/stargazers
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
 [license-url]: https://github.com/vyavasthita/mail-integration/blob/master/LICENSE.txt
@@ -688,4 +693,8 @@ TBD
 [Python-url]: https://www.python.org/
 [Docker]: https://img.shields.io/badge/Docker-4A4A55?style=for-the-badge&logo=docker&logoColor=FF3E00
 [Docker-url]: https://www.docker.com/
+[linkedin-url]: https://www.linkedin.com/in/diliplakshya/
+[Docker Compose]: https://img.shields.io/badge/-Docker%20Compose-blue?logo=docker&logoColor=white&style=for-the-badge
 [Docker-Compose-url]: https://docs.docker.com/compose/
+[Makefile]: https://img.shields.io/badge/-makefile-red?logo=gnu&logoColor=white&style=for-the-badge
+[Makefile-url]: https://www.gnu.org/software/make/
