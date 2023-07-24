@@ -19,14 +19,14 @@ CREATE TABLE IF NOT EXISTS email(
     PRIMARY KEY (message_id)
 );
 
-CREATE TABLE IF NOT EXISTS email_label(
-    id int NOT NULL AUTO_INCREMENT,  
-    label_id varchar(25) NOT NULL,
-    message_id varchar(25) NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (label_id) REFERENCES label(label_id),
-    FOREIGN KEY (message_id) REFERENCES email(message_id)
-);
+-- CREATE TABLE IF NOT EXISTS email_label(
+--     id int NOT NULL AUTO_INCREMENT,  
+--     label_id varchar(25) NOT NULL,
+--     message_id varchar(25) NOT NULL,
+--     PRIMARY KEY (id),
+--     FOREIGN KEY (label_id) REFERENCES label(label_id),
+--     FOREIGN KEY (message_id) REFERENCES email(message_id)
+-- );
 
 CREATE TABLE IF NOT EXISTS email_sender(  
     message_id varchar(25) NOT NULL,

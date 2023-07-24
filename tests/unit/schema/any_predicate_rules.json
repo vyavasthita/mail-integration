@@ -1,0 +1,23 @@
+[
+    {
+        "field": "Subject",
+        "code": 3,
+        "predicate": {
+            "type": "str",
+            "code": 1,
+            "name": "contains",
+            "value": "some testing subject"
+        }
+    },
+    {
+        "field": "Date Received",
+        "code": 5,
+        "predicate": {
+            "type": "date",
+            "code": 5,
+            "name": "is less than",
+            "duration": "days",
+            "value": 2
+        }
+    }
+]

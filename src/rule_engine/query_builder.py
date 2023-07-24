@@ -119,7 +119,7 @@ class QueryBuilder:
             days_duration (str): Months or days
         """
         return change_format_from_datetime(
-            subtract_days(get_today(), days_duration), "%Y-%m-%d"
+            subtract_days(get_today(), days_duration - 1), "%Y-%m-%d"
         )
 
     def gen_date_field_query_str(
@@ -362,7 +362,7 @@ class AllQueryBuilder(QueryBuilder):
 
 
 class AnyQueryBuilder(QueryBuilder):
-    def build_any_predicate(self, conditions: dict) -> str:
+    def build_any_predicate(self, conditions: list) -> str:
         """
         Generate the complete query for 'Any' predicate.
 
@@ -379,11 +379,13 @@ class AnyQueryBuilder(QueryBuilder):
         SELECT message_id FROM email_date WHERE (received BETWEEN '2023-07-20' AND '2023-07-31');
 
         Args:
-            conditions (dict): Conditions for which query needs to be generated.
+            conditions (list): Conditions for which query needs to be generated.
 
         Returns:
             str: Query string
         """
+        print(conditions)
+        print("************************")
         cumulative_query = str()
 
         for index, condition in enumerate(conditions):

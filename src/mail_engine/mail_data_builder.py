@@ -56,7 +56,6 @@ class MailDataBuilder:
 
         self.mail_data.append(MailData(add_label, self.data["label"]))
         self.mail_data.append(MailData(add_email, self.data["email"]))
-        # self.mail_data.append(MailData(add_email_label, self.data["email_label"]))
         self.mail_data.append(MailData(add_sender, self.data["sender"]))
         self.mail_data.append(MailData(add_receiver, self.data["receiver"]))
         self.mail_data.append(MailData(add_subject, self.data["subject"]))
