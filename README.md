@@ -925,16 +925,16 @@ For example.
 
 This is one of the commands you use.
 
-docker exec backend-**<environment-name>** python mail_helper.py -h
+docker exec backend-<environment-name> python mail_helper.py -h
 
 Here just replace <environment-name> with the environment, so for QA environment, command will be like this; -
 
 - Use following command to start the CMD help
 
    ```sh
-   docker exec backend-**qa** python mail_helper.py -h
+   docker exec backend-qa python mail_helper.py -h
    ```
-   
+
 Same is true for all other application commands you are going to use.
 
 ## :gem: production Build Environment
@@ -956,7 +956,30 @@ configuration/production
    ```
    #### :pencil: Default build environment is 'development' and hence if we do not set BUILD_ENV variable, we will be treated in development environment.
 
-Starting application and running unit tests commands are same as development environment.
+Other installation steps are similar to development environment mentioned above.
+
+#### :eyes: Usage
+##### Starting Application
+
+Steps to start the application are same as development environment.
+
+You just need to change the name of container.
+
+For example.
+
+This is one of the commands you use.
+
+docker exec backend-<environment-name> python mail_helper.py -h
+
+Here just replace <environment-name> with the environment, so for Production environment, command will be like this; -
+
+- Use following command to start the CMD help
+
+   ```sh
+   docker exec backend-production python mail_helper.py -h
+   ```
+
+Same is true for all other application commands you are going to use.
 
 <!-- Deployment -->
 # :triangular_flag_on_post: Deployment
