@@ -56,7 +56,8 @@ Softwares/libraries used in this project.
 - Python 3.10
 
 ### Assumptions
-- Same email rule can be duplicated.
+- We can have multiple rules defined in json file.
+  But at a time we can run only one rule.
 
 ### Scope
 - Tested with english language search only.
@@ -453,7 +454,7 @@ Install my-project with npm
 Choose one the below build environments for testing;-
 Steps are similar for all the environments.
 
-## :large_blue_circle: Development Build Environment
+## :gem: Development Build Environment
 <!-- Env Variables -->
 ### :key: Environment Variables and Configuration
 
@@ -590,7 +591,7 @@ To run this project, you need to configure environment variables and configurati
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 <!-- Run -->
-### :running: Run Application
+### :running: Start Containers
 
 Now you are ready to start the application
 
@@ -611,8 +612,237 @@ This will start 3 docker containers.
 - MySql DB
 - Phpmyadmin
 
+Go to following URL to see mysql database tables and data.
+
+```bash
+  http://127.0.0.1:8080/
+```
+
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
     
+
+<!-- Usage -->
+#### :eyes: Usage
+##### Starting Application
+
+This application runs as a part of command line utility.
+
+- Use following command to start the CMD help
+   ```sh
+   docker exec backend-development python mail_helper.py -h
+   ```
+- It will print following output
+
+   ```
+    2023-07-24 08:33:04,105 - src.utils.api_logger - INFO - Get the choice selected by user from command line.
+    usage: mail_helper [-h]
+                    [-v | -a | -u | -e | -s {rule_1,rule_2,rule_3,all} | -ar {rule_1,rule_2,rule_3}]
+
+    List the cmd parameters for mail helper
+
+    options:
+    -h, --help            show this help message and exit
+    -v, --validate        To do baisc validiation for db connection, rule parser
+                            validation etc. (default: False)
+    -a, --auth            To do authentication with gmail api. (default: False)
+    -u, --unauth          To do un-authentication with gmail api. (default:
+                            False)
+    -e, --email           To fetch emails from Gmail (default: False)
+    -s {rule_1,rule_2,rule_3,all}, --showrules {rule_1,rule_2,rule_3,all}
+                            Show all the available rules. Select all for all rules
+                            or select a particular rule (default: None)
+    -ar {rule_1,rule_2,rule_3}, --applyrule {rule_1,rule_2,rule_3}
+                            Apply given rule by its name with value from json key
+                            'rule' (default: None)
+
+    Thanks for using mail_helper! :)
+   ```
+Out of above commands, following commands are optional and they are added just to simplify your life.
+    -v, --validate
+    -a, --auth
+    -u, --unauth
+    -s  {choices}
+- Usages of various commands
+
+##### 1. Basic validations
+###### :pencil: This is an optional feature. 
+
+You can skip it, any way before running other commands, db validation will be checked.
+
+To validate we are connected to database, run following command
+
+```bash
+  docker exec backend-development python mail_helper.py -v
+```
+
+This command will start a connection to database and then close it.
+If no exceptions are raised then we are good to proceed.
+If you see error messages that db connection failed, then request you to verify MYSQL environment
+variables in configuration/development/.env.app file.
+###### 2. OAuth2 with gmail api
+###### :pencil: This is an optional step. 
+
+You can skip it, any way before running other commands, Oauth2 will be checked.
+
+To trigger gmail OAuth, run following command
+
+```bash
+  docker exec backend-development python mail_helper.py -a
+```
+
+This command will start a connection with gmail using OAuth2. Example -
+
+```
+Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=1013022794356-hgt1ura6u0m066lm7mgbn18md55q3jsp.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A8181%2F&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.readonly+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.modify&state=h6eZcjPqOVwYf6cdSMJHRbuXdomhgv&access_type=offline
+
+```
+It will ask you to copy this url and use it in browser to authenticate yourself. 
+Copy this url and open it in chrome browser.
+Proceed with Authorization.
+Once done, it will ask you to close the browser, you close the browser and application will continue.
+This is called OAuth2.
+
+This creates a 'token.json' file in the current working directory. 
+This json file contains access token, refreash token etc.
+Next time when you run the auth flow or you run other commands which implicitly triggers auth flow, you 
+do not need to go through authorization flow again. Gmail api checks the presense of this token.json file.
+
+If file present then it will use the access token from it. If access token is expired then it will use
+the refresh token to generate access token again.
+
+So first time when you ran it, token.json file was not present, hence it ask you to open browser and authorize yourself.
+
+When we run the auth flow again authorization will not be required.
+
+###### :pencil: Use the same gmail account which you configured for Oauth2 as per prerequisites step.
+
+Tested this only in chrome browser.
+
+If you rerun the flow again, it won't ask you to authorize again. This is one time step.
+
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
+
+###### 3. Un OAuth2 with gmail api
+###### :pencil: This is an optional step.
+
+You can skip it. This is just an extra features added to test auth multiple times if you wish.
+
+To trigger unauthentication, run following command
+
+```bash
+  docker exec backend-development python mail_helper.py -u
+```
+
+This command will will delete token.json file if present. Thats all it does.
+
+With the help of this command you can re run the previus command to start authorization.
+This is just an helper command to you. It does not implement any feature.
+
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
+
+###### 4. Show rules
+###### :pencil: This is an optional step. 
+
+As per the buisness requirements, we need to define emails rules and actions.
+I have created a json file having all possible rules and actions.
+This json file is present in following directory;-
+
+./configuration/development/email_rules.json
+
+This file contains a list of rules. Each rule having a name with key 'rule'.
+Now when we want to run the other commands to download email or apply rules, we need to choose one among
+the rules defined in our email_rules.json file.
+
+To help you out to know the details of each rule, you can use this command.
+So this command is just for viewing and verification purpose that what all the rules available for each rule.
+
+Also please not that when you previously run command with '-h' arument, you saw output like this
+
+-s {rule_1,rule_2,rule_3,all}
+
+As you can see, 'rule_1', 'rule_2' etc. are the name of the available rules from email_rules.json. So the application is intelligent enough to provide you the available rules to choose from.
+
+You use this command like this;-
+
+```bash
+  docker exec backend-development python mail_helper.py -s <rule_name>
+```
+
+Replace <rule_name> with a name from email_rules.json. E.g. 'rule_3'.
+You will see an output like this.
+
+```
+{
+ "rule": "rule_3",
+ "predicate": "any",
+ "conditions": [
+  {
+   "field": "From",
+   "code": 1,
+   "predicate": {
+    "type": "str",
+    "code": 1,
+    "name": "contains",
+    "value": "Google Accounts Team"
+   }
+  }
+ ],
+ "actions": [
+  {
+   "code": 1,
+   "name": "Move",
+   "label": "INBOX"
+  },
+  {
+   "code": 2,
+   "name": "Read",
+   "label": "Unread"
+  }
+ ]
+}
+```
+Note: if you use any name other than the available rules in -h command, then you app will throw an error.
+
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
+
+###### 5. Fetch Emails
+###### :pencil: This is the first python script in our buisness requirement
+
+As per the buisness requirements, we need to create an standalone script to fetch emails
+from gmail using OAuth.
+
+This commands lets us achieve that buisness requirement.
+
+If OAuth is not done previously (which was optional) then this command will first start OAuth flow.
+It will download emails from gmail and store them into mysql.
+
+This is the command to trigger fetching emails.
+
+```bash
+  docker exec backend-development python mail_helper.py -e
+```
+
+Note: If we re run the commands then data will be overwritten in database.
+
+###### 6. Apply rules
+###### :pencil: This is the Second python script in our buisness requirement
+
+As per the buisness requirements, we need to read rules from a json file and apply those rules and 
+update email using rest api.
+
+This commands lets us achieve that buisness requirement.
+
+If OAuth is not done previously (which was optional) then this command will first start OAuth flow.
+It will construct required query and read filtered emails messages id and use those to update labels in gmail.
+
+This is the command to trigger fetching emails.
+
+```bash
+  docker exec backend-development python mail_helper.py -ar <rule_name>
+```
+
+Replace <rule_name> with a name from email_rules.json. E.g. 'rule_3'.
+
 <!-- Running Tests -->
 ### :test_tube: Running Tests
 
@@ -682,7 +912,30 @@ configuration/qa
    ```
    #### :pencil: Default build environment is 'development' and hence if we do not set BUILD_ENV variable, we will be treated in development environment.
 
-Starting application and running unit tests commands are same as development environment.
+Other installation steps are similar to development environment mentioned above.
+
+#### :eyes: Usage
+##### Starting Application
+
+Steps to start the application are same as development environment.
+
+You just need to change the name of container.
+
+For example.
+
+This is one of the commands you use.
+
+docker exec backend-**<environment-name>** python mail_helper.py -h
+
+Here just replace <environment-name> with the environment, so for QA environment, command will be like this; -
+
+- Use following command to start the CMD help
+
+   ```sh
+   docker exec backend-**qa** python mail_helper.py -h
+   ```
+   
+Same is true for all other application commands you are going to use.
 
 ## :gem: production Build Environment
 - To run project in production environment, you need to configure environment variables and configuration files
@@ -707,13 +960,6 @@ Starting application and running unit tests commands are same as development env
 
 <!-- Deployment -->
 # :triangular_flag_on_post: Deployment
-
-TBD
-
-<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
-
-<!-- Usage -->
-# :eyes: Usage
 
 TBD
 

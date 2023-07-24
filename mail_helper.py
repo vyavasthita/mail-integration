@@ -34,6 +34,7 @@ from src.mail_engine.mail_engine import MailEngine
 from src.rule_engine.rule_validation import RuleValidation
 from src.rule_engine.rule_engine import RuleEngine
 from src.utils.api_logger import ApiLogger
+from src.utils.file_helper import delete_file
 from src.data_layer.db_validation import check_db_connection
 from src.initialize import auth, un_auth
 
@@ -85,7 +86,7 @@ class CommandInterface:
             "--validate",
             default=False,
             action="store_true",
-            help="To do baisc validiation for db connection, rule parser validation etc.",
+            help="To do baisc validiation for db connection.",
         )
 
         group.add_argument(
@@ -278,9 +279,17 @@ class MailHelper:
         elif choice.option == ArgOption.APPLY_RULES:
             self.start_rule_engine(choice.rule)
 
+    def clean_up(self) -> None:
+        """
+        Do necessary clean up required.
+        """
+        delete_file("credentials.json")
+
 
 if __name__ == "__main__":
     mail_helper = MailHelper()
 
     mail_helper.cli = CommandInterface()
     mail_helper.start()
+    mail_helper.clean_up()
+    print("*********** Application Ended *********************")
