@@ -59,7 +59,9 @@ class DBConnection:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        ApiLogger.log_info("Disconnecting from database.")
         if self.connection.is_connected():
             self.cursor.close()
             # close db connection
             self.connection.close()
+            ApiLogger.log_info("Disconneced from database.")

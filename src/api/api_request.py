@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from src import env_configuration
 from src.rule_engine.action_data import ActionData, ActionCode
 from src.auth.connection import AuthConnection
+from src.utils.api_logger import ApiLogger
 
 
 @dataclass
@@ -42,10 +43,11 @@ class ApiRequest:
                 add_labels.append(data.label)
             else:
                 remove_labels.append("UNREAD")
-
         return add_labels, remove_labels
 
-    def gen_request_body(self, message_ids: list, action_data: List[ActionData]) -> dict:
+    def gen_request_body(
+        self, message_ids: list, action_data: List[ActionData]
+    ) -> dict:
         """
         Generate Request body for calling gmail rest api.
 
@@ -72,5 +74,11 @@ class ApiRequest:
         """
         url = "https://gmail.googleapis.com/gmail/v1/users/me/messages/batchModify"
 
+        request_body = self.gen_request_body(message_ids, action_data)
+
+        ApiLogger.log_info("Request Body")
+        ApiLogger.log_info(request_body)
+
         with AuthConnection() as auth:
-            auth.session.post(url, data=self.gen_request_body(message_ids, action_data))
+            response = auth.session.post(url, data=request_body)
+            return response.status_code

@@ -26,4 +26,5 @@ class ActionBuilder:
         """
         Create action data object from json data in email_rules.json
         """
-        self.action_data = [ActionData(action["code"], action["label"]) for action in self.actions]
+        for action in self.actions:
+            self.action_data.append(ActionData(action["code"], action["label"]))

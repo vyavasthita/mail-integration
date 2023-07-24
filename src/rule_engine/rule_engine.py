@@ -19,6 +19,7 @@ from src.rule_engine.action_data import ActionData, ActionCode
 from src.utils.api_logger import ApiLogger
 from src.data_layer.mail_dao import MailDao
 from src.api.api_request import ApiRequest
+from src.api.http_status import HttpStatus
 
 
 @dataclass
@@ -65,6 +66,10 @@ class RuleEngine:
             selected_rule_data["predicate"], selected_rule_data["conditions"]
         )
 
+        ApiLogger.log_info("Generated query.")
+        ApiLogger.log_info(query)
+
+        ApiLogger.log_info("Building actions")
         self.build_actions(selected_rule_data["actions"])
 
         return query
@@ -76,5 +81,23 @@ class RuleEngine:
         Args:
             selected_rule_data (dict): _description_
         """
+        generated_query = self.build(selected_rule_data)
+
+        ApiLogger.log_info("Selected messaged based on the generated query.")
+
+        result_set = MailDao.read(generated_query)
+
+        if not result_set:
+            ApiLogger.log_warning("No records available to apply action upon.")
+            return
+
+        ApiLogger.log_info("Updating labels for the selected messages.")
         api_request = ApiRequest()
-        api_request.update_label( MailDao.read(self.build(selected_rule_data)), self.action_data)
+        status = api_request.update_label(result_set, self.action_data)
+
+        if status == HttpStatus.HTTP_204_NO_CONTENT:
+            ApiLogger.log_info("Labels updated successfully")
+        elif status == HttpStatus.HTTP_400_BAD_REQUEST:
+            ApiLogger.log_error("Failed to update labels. Bad request.")
+        elif status == HttpStatus.HTTP_404_NOT_FOUND:
+            ApiLogger.log_error("Given message not found.")

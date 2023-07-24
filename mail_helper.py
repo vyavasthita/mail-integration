@@ -249,7 +249,7 @@ class MailHelper:
         Args:
             rule (str): The selected rule to apply.
         """
-        ApiLogger.log_debug("Starting Rule Engine.")
+        ApiLogger.log_debug("Starting Rule Engine for rulr {rule}.")
 
         rule_data = self.rule_parser.get_rule(rule)
         rule_engine = RuleEngine()

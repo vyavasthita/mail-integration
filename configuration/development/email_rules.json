@@ -70,17 +70,17 @@
             {
                 "code": 1,
                 "name": "Move",
-                "label": "Inbox"
+                "label": "INBOX"
             },
             {
                 "code": 2,
                 "name": "Read",
-                "label": "Unread"
+                "label": "READ"
             },
             {
                 "code": 3,
                 "name": "Unread",
-                "label": "Unread"
+                "label": "UNREAD"
             }
         ]
     },
@@ -160,35 +160,41 @@
             {
                 "code": 3,
                 "name": "Unread",
-                "label": "Unread"
+                "label": "UNREAD"
             }
         ]
     },
     {
-        "rule": "rule_3",
-        "predicate": "any",
+        "rule": "rule_4",
+        "predicate": "all",
         "conditions": [
             {
-                "field": "From",
-                "code": 1,
+                "field": "Subject",
+                "code": 3,
                 "predicate": {
                     "type": "str",
                     "code": 1,
                     "name": "contains",
-                    "value": "Google Accounts Team"
+                    "value": "EPAM Technical Interview"
+                }
+            },
+            {
+                "field": "Date Received",
+                "code": 5,
+                "predicate": {
+                    "type": "date",
+                    "code": 5,
+                    "name": "is less than",
+                    "duration": "days",
+                    "value": 1
                 }
             }
         ],
         "actions": [
             {
-                "code": 1,
-                "name": "Move",
-                "label": "INBOX"
-            },
-            {
-                "code": 2,
-                "name": "Read",
-                "label": "Unread"
+                "code": 3,
+                "name": "Unread",
+                "label": "UNREAD"
             }
         ]
     }

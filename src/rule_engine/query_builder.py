@@ -148,9 +148,9 @@ class QueryBuilder:
         condition_operator = str()
 
         if predicate_code == QueryBuilder.Predicate.LESS_THAN:
-            condition_operator = QueryBuilder.Operator.LESS_THAN
-        elif predicate_code == QueryBuilder.Predicate.GREATOR_THAN:
             condition_operator = QueryBuilder.Operator.GREATOR_THAN
+        elif predicate_code == QueryBuilder.Predicate.GREATOR_THAN:
+            condition_operator = QueryBuilder.Operator.LESS_THAN
 
         return f"{column} {condition_operator} '{start_date}'"
 
@@ -377,7 +377,7 @@ class AnyQueryBuilder(QueryBuilder):
         SELECT message_id FROM email_date WHERE (received BETWEEN '2023-06-20' AND '2023-07-20')
         UNION
         SELECT message_id FROM email_date WHERE (received BETWEEN '2023-07-20' AND '2023-07-31');
-            
+
         Args:
             conditions (dict): Conditions for which query needs to be generated.
 

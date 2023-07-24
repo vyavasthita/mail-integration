@@ -34,6 +34,10 @@ Details:
 * These emails data and metadata are stored in Mysql database.
 * User can apply filters and take action on these emails, say to move email to different label, by updating rules defined in a JSON file.
 
+It uses google rest api
+Ref: https://developers.google.com/gmail/api/reference/rest
+
+
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ## Built With
@@ -58,6 +62,8 @@ Softwares/libraries used in this project.
 ### Assumptions
 - We can have multiple rules defined in json file.
   But at a time we can run only one rule.
+- Every time we run the script to fetch the emails, we download the all requested emails
+  and update/overwrite the date if email is duplicate.
 
 ### Scope
 - Tested with english language search only.
@@ -66,6 +72,11 @@ Softwares/libraries used in this project.
 - This app is tested on Ubuntu 22.04 LTS.
 - Automated unit tests have been written using pytest.
 - Automated Unit test coverage is 0%.
+
+### Email Rules
+I have created one email_rules.json file having all rules to apply and the actions
+to take on those rules.
+Under action section, we need to use labels. Name 
 
 ### :pencil: Notes
 Application is tested with root user of mysql db.
@@ -424,6 +435,7 @@ Follow below steps to install the app.
 
     * Enable Gmail Api
     ```sh
+    https://console.cloud.google.com/apis/dashboard
     https://developers.google.com/gmail/api/quickstart/python
     ```
 
