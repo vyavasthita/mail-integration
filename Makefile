@@ -21,7 +21,7 @@ help:
 	@echo "  logs		show logs of containers"
 	@echo "  ps		show container status"
 	@echo "  destroy	destroy containers"
-	@echo "  test	run automated tests"
+	@echo "  test		run automated tests"
 	@echo ""
 	@echo "Choose one option!"
 

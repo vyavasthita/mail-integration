@@ -10,9 +10,7 @@
         ]
     },
     "message": {
-        "max_email_read": 2,
-        "labels": [
-            "INBOX"
-        ]
+        "max_email_read": 100,
+        "labels": []
     }
 }

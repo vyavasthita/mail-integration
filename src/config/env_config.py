@@ -39,34 +39,34 @@ for environment_file in env_by_name.values():
     load_dotenv(dotenv_path=environment_file)
 
 
-class DevelopmentConfig:
-    CLIENT_ID = os.getenv("CLIENT_ID_DEV")
-    PROJECT_ID = os.getenv("PROJECT_ID_DEV")
-    AUTH_URI = os.getenv("AUTH_URI_DEV")
-    TOKEN_URI = os.getenv("TOKEN_URI_DEV")
-    AUTH_PROVIDER_X509_CERT_URL = os.getenv("AUTH_PROVIDER_X509_CERT_URL_DEV")
-    CLIENT_SECRET = os.getenv("CLIENT_SECRET_DEV")
-    REDIRECT_URIS = os.getenv("REDIRECT_URIS_DEV")
-    API_URL = os.getenv("API_URL_DEV")
-    REFRESH_TOKEN = os.getenv("REFRESH_TOKEN_DEV") or None
+class AppConfig:
+    CLIENT_ID = os.getenv("CLIENT_ID_APP")
+    PROJECT_ID = os.getenv("PROJECT_ID_APP")
+    AUTH_URI = os.getenv("AUTH_URI_APP")
+    TOKEN_URI = os.getenv("TOKEN_URI_APP")
+    AUTH_PROVIDER_X509_CERT_URL = os.getenv("AUTH_PROVIDER_X509_CERT_URL_APP")
+    CLIENT_SECRET = os.getenv("CLIENT_SECRET_APP")
+    REDIRECT_URIS = os.getenv("REDIRECT_URIS_APP")
+    API_URL = os.getenv("API_URL_APP")
+    REFRESH_TOKEN = os.getenv("REFRESH_TOKEN_APP") or None
 
-    USER_ID = os.getenv("USER_ID_DEV")
+    USER_ID = os.getenv("USER_ID_APP")
 
-    MYSQL_HOST = os.getenv("MYSQL_HOST_DEV")
-    MYSQL_USER = os.getenv("MYSQL_USER_DEV")
-    MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD_DEV")
-    MYSQL_DB = os.getenv("MYSQL_DB_DEV")
-    USER_ID = os.getenv("USER_ID_DEV")
-    MYSQL_PORT = os.getenv("MYSQL_PORT_DEV")
+    MYSQL_HOST = os.getenv("MYSQL_HOST_APP")
+    MYSQL_USER = os.getenv("MYSQL_USER_APP")
+    MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD_APP")
+    MYSQL_DB = os.getenv("MYSQL_DB_APP")
+    USER_ID = os.getenv("USER_ID_APP")
+    MYSQL_PORT = os.getenv("MYSQL_PORT_APP")
 
     # Configuration file for logging
     LOG_CONFIG_FILE = f"./configuration/{build_environment}/logging.conf"
 
     # Directory where logs will be generated.
-    LOGS_DIR = os.getenv("LOGS_DIR_DEV") or "/tmp/mail_api_logs"
+    LOGS_DIR = os.getenv("LOGS_DIR_APP") or "/tmp/mail_api_logs"
 
     # Log File name
-    LOG_FILE_NAME = os.getenv("LOG_FILE_NAME_DEV") or "mail_api.log"
+    LOG_FILE_NAME = os.getenv("LOG_FILE_NAME_APP") or "mail_api.log"
 
 
 class TestConfig:
@@ -99,4 +99,4 @@ class TestConfig:
     LOG_FILE_NAME = os.getenv("LOG_FILE_NAME_TEST") or "mail_api.log"
 
 
-config_by_name = dict(app=DevelopmentConfig(), test=TestConfig())
+config_by_name = dict(app=AppConfig(), test=TestConfig())
