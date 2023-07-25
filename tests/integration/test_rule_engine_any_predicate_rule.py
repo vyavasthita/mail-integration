@@ -53,14 +53,3 @@ SELECT message_id FROM email_date WHERE received > '{}';""".format(
             "message_id_4",
         ]
     )
-
-    # truncate date post verification
-    db_connection.cursor().execute("SET foreign_key_checks = 0")
-    db_connection.cursor().execute("TRUNCATE TABLE email_sender")
-    db_connection.cursor().execute("TRUNCATE TABLE email_receiver")
-    db_connection.cursor().execute("TRUNCATE TABLE email_subject")
-    db_connection.cursor().execute("TRUNCATE TABLE email_content")
-    db_connection.cursor().execute("TRUNCATE TABLE email_date")
-    db_connection.cursor().execute("TRUNCATE TABLE email")
-    db_connection.cursor().execute("SET foreign_key_checks = 1")
-    db_connection.commit()

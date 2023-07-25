@@ -18,7 +18,31 @@ def db_connection():
     except Exception:
         pass
     finally:
+        # truncate date post verification
+        connection.cursor().execute("SET foreign_key_checks = 0")
+        connection.cursor().execute("TRUNCATE TABLE label")
+        connection.cursor().execute("TRUNCATE TABLE email_sender")
+        connection.cursor().execute("TRUNCATE TABLE email_receiver")
+        connection.cursor().execute("TRUNCATE TABLE email_subject")
+        connection.cursor().execute("TRUNCATE TABLE email_content")
+        connection.cursor().execute("TRUNCATE TABLE email_date")
+        connection.cursor().execute("TRUNCATE TABLE email")
+        connection.cursor().execute("SET foreign_key_checks = 1")
+        connection.commit()
         connection.close()
+
+
+# def clean_up_tables():
+#     # truncate date post verification
+#     connection.cursor().execute("SET foreign_key_checks = 0")
+#     connection.cursor().execute("TRUNCATE TABLE email_sender")
+#     connection.cursor().execute("TRUNCATE TABLE email_receiver")
+#     connection.cursor().execute("TRUNCATE TABLE email_subject")
+#     connection.cursor().execute("TRUNCATE TABLE email_content")
+#     connection.cursor().execute("TRUNCATE TABLE email_date")
+#     connection.cursor().execute("TRUNCATE TABLE email")
+#     connection.cursor().execute("SET foreign_key_checks = 1")
+#     connection.commit()
 
 
 @pytest.fixture

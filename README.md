@@ -37,7 +37,6 @@ Details:
 It uses google rest api
 Ref: https://developers.google.com/gmail/api/reference/rest
 
-
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ## Built With
@@ -56,13 +55,13 @@ Softwares/libraries used in this project.
 - OS - Ubuntu 22.04
 - Docker Compose version v2.17.3
 - Docker version 23.0.6
+- GNU Make 4.3
 - Mysql 8.0.29
 - Python 3.10
 
 ### Assumptions
 - We can not have multiple rules (with same field) defined in json file.
   E.g. we can not have two 'From' fields in our json rules.
-  But at a time we can run only one rule.
 - Every time we run the script to fetch the emails, we download the all requested emails
   and update/overwrite the date if email is duplicate.
 
@@ -70,14 +69,13 @@ Softwares/libraries used in this project.
 - Tested with english language search only.
 - Tested without special characters search.
 - Tested against Mysql InnoDB engine only.
-- This app is tested on Ubuntu 22.04 LTS.
 - Automated unit tests have been written using pytest.
-- Automated Unit test coverage is 0%.
+- If email script is run again, it will update the database.
+- We can fetch emails by providing list of labels in config/<environment>/app_config.json
 
 ### Email Rules
 I have created one email_rules.json file having all rules to apply and the actions
 to take on those rules.
-Under action section, we need to use labels. Name 
 
 ### :pencil: Notes
 Application is tested with root user of mysql db.
@@ -91,34 +89,8 @@ If invalid rule is provided in rule parser json file then application will exit.
 ## Design Goals
 ### Independent Components
 Application should be divided into multiple small components which do one particular task.
+This application is divided into few small components.
 
-### Simplicity
-Source code and Database table structure should be less complex or say should be simple to understand.
-
-### Design Patterns
-Single Responsibility design pattern of SOLID principle is followed.
-Singletone design pattern is followed.
-
-### Scalable
-
-### Flexible
-Ability of the application to adapt and evolve to accommodate new requirements without affecting the existing operations. 
-Flexibility in the application can be achieved by; -
-    • Use of Gang of Four design patterns.
-    • Use of SOLID principle of design patterns.
-    • Use of object-oriented programming principles.
-    • Designing database tables.
-
-### Readable and Understandable
-Software is meant for modification/improvements. Fellow developers should be able to understand the code.
-This could be achieved by; -
-    • Coding guidelines.
-    • Comments/Description of classes and methods used.
-    • Documentation (Doc string comments in Python), README document.
-
-<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
-
-## :dart: Features
 1. Mail Engine
     Connects with gmail api
     Fetches email content
@@ -132,15 +104,38 @@ This could be achieved by; -
     Reads data from database based on query
     Updates Mail Server through RestAPIs.
 
-If email script is run again, it will update the database.
+3. Api 
+    Connects with gmail api over REST
+    Update email label
 
-- We can fetch emails by providing list of labels in config/<environment>/app_config.json
+### Simplicity
+Source code and Database table structure should be less complex or say should be simple to understand.
+I have followed all possible best practices to make code structure simple.
+
+### Design Patterns
+Single Responsibility design pattern of SOLID principle is followed.
+Each class does one thing only.
+Singletone design pattern is followed.
+
+### Flexible
+Ability of the application to adapt and evolve to accommodate new requirements without affecting the existing operations. 
+
+This application is modularized into small python modules which allow us to add new requirements.
+
+### Readable and Understandable
+Software is meant for modification/improvements. Fellow developers should be able to understand the code.
+This could be achieved by; -
+    • Coding guidelines.
+    • Comments/Description of classes and methods used.
+    • Documentation (Doc string comments in Python), README document.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ## :art: Best Practices
-
+#### :white_check_mark: Different configurations for differnent environments like Dev, test, QA, Production.
 #### :white_check_mark: Use of context manager for db connection, gmail authentication
+#### :white_check_mark: Use of environment variables.
+#### :white_check_mark: DB transactions are used while inserting data into database support Atomicity.
 #### :white_check_mark: Poetry for managing different environments
 #### :white_check_mark: Normalized DB Schema with Full text search index for pattern matching
 #### :white_check_mark: Python Logging - Console and File with proper log level
@@ -148,8 +143,6 @@ If email script is run again, it will update the database.
 #### :white_check_mark: Doc string added for all modules and methods
 #### :white_check_mark: Type annotations are added for all methods.
 #### :white_check_mark: Docker with docker compose used.
-#### :white_check_mark: Use of environment variables.
-#### :white_check_mark: DB transactions are used while inserting data into database support Atomicity.
 #### :white_check_mark: Unit tests with coverage report
 #### :white_check_mark: Detailed README file.
 #### :white_check_mark: Proper git commit messages. Every commit is done post completing a functionality.
@@ -162,7 +155,8 @@ If email script is run again, it will update the database.
 #### :white_check_mark: Proper directory and file structure of source code.
 #### :white_check_mark: Import statements are in order.
 #### :white_check_mark: Python core -> Third party -> Application modules
-#### :white_check_mark: Different configurations for differnent environments like Dev, test, QA, Production.
+
+#### :white_check_mark: For code formatting black package is used. 
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
@@ -222,11 +216,15 @@ Environment: development
 
 Name: pytest
 Purpose: Write automated tests
-Environment: development
+Environment: test
 
 Name: pytest-cov
 Purpose: Automated tests coverage
-Environment: development
+Environment: test
+
+Name: pytest-mock
+Purpose: To mock objects and functions
+Environment: test
 
 Name: requests-oauthlib
 Purpose: OAuth2 for restapi using requests

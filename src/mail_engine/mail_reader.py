@@ -208,6 +208,8 @@ class MailReader:
             ApiLogger.log_warning("No messages were found in gmail.")
             return
 
+        ApiLogger.log_info(f"Total emails found : {len(messages)}")
+
         for message in messages:
             mail_field = MailField()
 
@@ -222,7 +224,7 @@ class MailReader:
             db_data["receiver"].append((mail_field.id, mail_field.receiver))
             db_data["subject"].append((mail_field.id, mail_field.subject))
 
-            if mail_field.body:  # To Do: Why date is None ?
+            if mail_field.body:
                 db_data["content"].append((mail_field.id, mail_field.body))
             db_data["date"].append((mail_field.id, mail_field.date))
 
@@ -257,6 +259,8 @@ class LabelReader:
         if not labels:
             ApiLogger.log_warning("No labels were found in gmail.")
             return
+
+        ApiLogger.log_info(f"Total labels found : {len(labels)}")
 
         for label in labels:
             label_data.append((label["id"], label["name"]))
