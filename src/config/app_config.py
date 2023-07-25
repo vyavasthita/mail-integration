@@ -55,7 +55,7 @@ class AppConfigParser:
         json_reader = JsonReader(self.file_path)
         try:
             self.data = json_reader.read()
-        except ValueError as error:
+        except ValueError:
             ApiLogger.log_critical("Failed to parse App Config File. Exiting...")
             sys.exit(0)
 

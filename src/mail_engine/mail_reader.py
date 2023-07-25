@@ -11,7 +11,6 @@ About; -
 """
 
 # Core python packages
-import os.path
 import base64
 from typing import List
 from dataclasses import dataclass, field

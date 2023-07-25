@@ -41,12 +41,11 @@ class MailEngine:
         """
         It processess labels data by downloading them from gmail.
         """
+        ApiLogger.log_debug("Fetching labels.")
         label_data = list()
 
         with GmailConnection() as connection:
             label_reader = LabelReader(connection=connection)
-
-            ApiLogger.log_debug("Fetching labels.")
             label_reader.parse(label_data)  # pass by object reference
 
         self.data["label"] = label_data
@@ -56,10 +55,9 @@ class MailEngine:
         """
         It reads mail data.
         """
+        ApiLogger.log_debug("Fetching emails.")
         with GmailConnection() as connection:
             mail_reader = MailReader(connection)
-
-            ApiLogger.log_debug("Fetching emails.")
             mail_reader.read(db_data=self.data)  # pass by object reference
 
     @timer
@@ -68,10 +66,7 @@ class MailEngine:
         It reads mail data and drives writing data to db.
         """
         self.init_data()
-
         self.process_labels()
-
         self.process_emails()
-
         self.mail_data_builder.construct_write_data()
         self.mail_data_builder.write_to_db()

@@ -29,11 +29,6 @@ class MailDataBuilder:
         add_email = """
             INSERT INTO email(message_id, is_read) value(%s, %s) ON DUPLICATE KEY UPDATE is_read = is_read
         """
-
-        add_email_label = """
-            INSERT INTO email_label(label_id, message_id) value(%s, %s)
-        """
-
         add_sender = """
             INSERT INTO email_sender(message_id, sender) value(%s, %s) ON DUPLICATE KEY UPDATE sender = sender
         """

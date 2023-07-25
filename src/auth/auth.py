@@ -51,7 +51,8 @@ class Auth:
         if self.is_authenticated():
             ApiLogger.log_info("User is already authenticated.")
         else:
-            with GmailConnection() as connection:  # do auth flow
+            # Do Auth flow
+            with GmailConnection() as connection:  # noqa: F841
                 pass
 
         # Read refresh token from token.json file and save in memory
@@ -61,7 +62,7 @@ class Auth:
 
         try:
             token_data = json_reader.read()
-        except ValueError as error:
+        except ValueError:
             ApiLogger.log_critical("Failed to parse App Config File.")
 
         env_configuration.REFRESH_TOKEN = token_data["refresh_token"]

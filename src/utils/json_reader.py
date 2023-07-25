@@ -35,7 +35,7 @@ class JsonReader:
             try:
                 with open(self.file_path) as json_file_object:
                     data = json.load(json_file_object)
-            except ValueError as error:
+            except ValueError:
                 ApiLogger.log_error(f"Invalid Json File. {self.file_path}")
         else:
             raise ValueError(

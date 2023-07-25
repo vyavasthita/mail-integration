@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 # Application packages
 from src.rule_engine.query_builder import AnyQueryBuilder, AllQueryBuilder
 from src.rule_engine.action_builder import ActionBuilder
-from src.rule_engine.action_data import ActionData, ActionCode
+from src.rule_engine.action_data import ActionData
 from src.utils.api_logger import ApiLogger
 from src.data_layer.mail_dao import MailDao
 from src.api.api_request import ApiRequest

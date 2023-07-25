@@ -1,0 +1,3 @@
+[flake8]
+extend-ignore = E501, E402
+exclude = .git,__pycache__, configuration, database, docker, images, tests

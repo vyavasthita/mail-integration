@@ -156,7 +156,7 @@ This could be achieved by; -
 #### :white_check_mark: Import statements are in order.
 #### :white_check_mark: Python core -> Third party -> Application modules
 
-#### :white_check_mark: For code formatting black package is used. 
+#### :white_check_mark: For code formatting black and flake8 packages are used. 
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
@@ -212,6 +212,10 @@ Environment: All (development, qa, production etc.)
 
 Name: black
 Purpose: Python code formatting
+Environment: development
+
+Name: flake8
+Purpose: Python code linting
 Environment: development
 
 Name: pytest

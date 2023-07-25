@@ -23,7 +23,6 @@ from googleapiclient.errors import HttpError
 from src import app_configuration
 from src.utils.file_helper import write_to_file, delete_file, check_file_exists
 from src.utils.api_logger import ApiLogger
-from src import app_configuration
 
 
 @dataclass
