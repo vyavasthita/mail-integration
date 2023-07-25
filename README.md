@@ -123,6 +123,8 @@ This application is divided into few small components.
     Reads data from database based on query
     Updates Mail Server through RestAPIs.
 
+![Rule Engine](images/rule_engine.png "Rule Engine")
+
 3. Api 
     Connects with gmail api over REST
     Update email label
