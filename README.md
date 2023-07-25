@@ -87,12 +87,12 @@ These permissions are defined like this.
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ### Email Rules
-I have created one email_rules.json file having all rules to apply and the actions
-to take on those rules.
+- I have created one email_rules.json file having all rules to apply and the actions
+  to take on those rules.
 
 - We can fetch emails by providing list of labels in config/<environment>/email_rules.json
 
-User can edit this rules file by modifying it or adding or removing rules and actions.
+- User can edit this rules file by modifying it or adding or removing rules and actions.
 
 ### :pencil: Notes
 
@@ -180,60 +180,59 @@ We can switch between multiple environment sjust by exporting an environment var
 Application should be divided into multiple small components which do one particular task.
 This application is divided into few small components.
 
-1. Mail Engine
-    Connects with gmail api.
-    Fetches email content.
-    Parses email content.
-    Writes email content to database.
+1. **Mail Engine**
+  - Connects with gmail api.
+  - Fetches email content.
+  - Parses email content.
+  - Writes email content to database.
 
 ![Mail Engine](images/mail_engine.png "Mail Engine")
 
-2. Rule Engine
-    Reads selected rule from rules.
-    Generates Query based on rules.
-    Generates Actions based on rules.
-    Reads data from database based on query.
-    Updates Mail Server through RestAPIs.
+2. **Rule Engine**
+  - Reads selected rule from rules.
+  - Generates Query based on rules.
+  - Generates Actions based on rules.
+  - Reads data from database based on query.
+  - Updates Mail Server through RestAPIs.
 
 ![Rule Engine](images/rule_engine.png "Rule Engine")
 
-3. Api 
-    Connects with gmail api over REST.
-    Update email label.
+3. **Api**
+  - Connects with gmail api over REST.
+  - Update email label.
 
-4. Auth
-    Authenticates to gmail using Oauth2.
+4. **Auth**
+  - Authenticates to gmail using Oauth2.
 
-5. data_layer
-    Data Access layer between other python components and database.
-    All communication to database happens through this layer.
+5. **data_layer**
+  - Data Access layer between other python components and database.
+  - All communication to database happens through this layer.
 
-6. utils
-    Utility functions common to all other modules.
+6. **utils**
+  - Utility functions common to all other modules.
 
-7. config
-    Reads configuration data which is shared across application.
+7. **config**
+  - Reads configuration data which is shared across application.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ### Simplicity
-Source code and Database table structure should be less complex or say should be simple to understand.
-I have followed all possible best practices to make code structure simple.
+- Source code and Database table structure should be less complex or say should be simple to understand.
+- I have followed all possible best practices to make code structure simple.
 
 ### Design Patterns
-Single Responsibility design pattern of SOLID principle is followed.
-Each class does one thing only.
-Singletone design pattern is followed for python logging.
+- Single Responsibility design pattern of SOLID principle is followed.
+- Each class does one thing only.
+- Singletone design pattern is followed for python logging.
 
 ### Flexible
-Ability of the application to adapt and evolve to accommodate new requirements without affecting the existing operations. 
-
-This application is modularized into small python modules which allow us to add new requirements or modify existing ones.
+- Ability of the application to adapt and evolve to accommodate new requirements without affecting the existing operations. 
+- This application is modularized into small python modules which allow us to add new requirements or modify existing ones.
 
 ### Readable and Understandable
-Software is meant for modification/improvements. Fellow developers should be able to understand the code.
+- Software is meant for modification/improvements. Fellow developers should be able to understand the code.
 
-This could be achieved by; -
+- This could be achieved by; -
     • Coding guidelines.
     • Comments/Description of classes and methods used.
     • Documentation (Doc string comments in Python), README document.
@@ -265,7 +264,7 @@ This could be achieved by; -
 #### :white_check_mark: Comments added wherever required
 #### :white_check_mark: Python Logging
 #### :white_check_mark: Import statements are in order
-                        Python core -> Third party -> Application modules
+Python core -> Third party -> Application modules
 #### :white_check_mark: Detailed README file
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
@@ -994,6 +993,19 @@ To run tests, run the following command
   make test
 ```
 
+### :pencil:
+I have written some integration tests, which call other modules which require authorization.
+
+Until this authorization is not done, application will be in waiting state and integration tests will too be in waiting state.
+
+Hence, make sure you have done authorization, by running the application (by using **-a** option), before executing unit tests.
+
+Workaround to this is, use below command to run unit tests (Verbose mode), which will print all logging information.
+And here you can copy the auth url and provide authorization.
+
+```bash
+  make testv
+```
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 <!-- Tests Coverage -->

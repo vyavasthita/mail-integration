@@ -1,7 +1,6 @@
 import pytest
 from mail_helper import MailHelper
 
-
 test_schema_dir = "tests/integration/schema"
 
 

@@ -169,13 +169,23 @@
         "predicate": "all",
         "conditions": [
             {
+                "field": "From",
+                "code": 1,
+                "predicate": {
+                    "type": "str",
+                    "code": 1,
+                    "name": "contains",
+                    "value": "interviews"
+                }
+            },
+            {
                 "field": "Subject",
                 "code": 3,
                 "predicate": {
                     "type": "str",
                     "code": 1,
                     "name": "contains",
-                    "value": "EPAM Technical Interview"
+                    "value": "UPDATED"
                 }
             },
             {
@@ -183,18 +193,61 @@
                 "code": 5,
                 "predicate": {
                     "type": "date",
-                    "code": 5,
+                    "code": 6,
                     "name": "is less than",
                     "duration": "days",
-                    "value": 1
+                    "value": 5
                 }
             }
         ],
         "actions": [
             {
-                "code": 3,
+                "code": 1,
+                "name": "move",
+                "label": "INBOX"
+            },
+            {
+                "code": 2,
                 "name": "Unread",
-                "label": "UNREAD"
+                "label": "READ"
+            }
+        ]
+    },
+    {
+        "rule": "rule_5",
+        "predicate": "all",
+        "conditions": [
+            {
+                "field": "From",
+                "code": 1,
+                "predicate": {
+                    "type": "str",
+                    "code": 2,
+                    "name": "does not contain",
+                    "value": "Scheduled"
+                }
+            },
+            {
+                "field": "Subject",
+                "code": 3,
+                "predicate": {
+                    "type": "str",
+                    "code": 1,
+                    "name": "contains",
+                    "value": "Confirmation email"
+                }
+            }
+        ],
+        "actions": [
+            {
+                "code": 1,
+                "name": "move",
+                "label": "INBOX"
+            },
+            {
+                "code": 2,
+                "name": "Read",
+                "label": "READ"
             }
         ]
     }

@@ -43,8 +43,6 @@ services:
         condition: service_healthy
     environment:
       - BUILD_ENV=development
-    volumes:
-      - ./:/app
     networks: 
       - mail-integration-development
 networks:

@@ -10,6 +10,7 @@ help:
 	@echo ""
 	@echo "  all		run stop -> up"
 	@echo "  test		run test"
+	@echo "  testv		run automated tests with standard output"
 	@echo "  testcov	run testcov"
 	@echo "  clean		clear network, container and images"
 	@echo "  build		build container images"
@@ -21,7 +22,6 @@ help:
 	@echo "  logs		show logs of containers"
 	@echo "  ps		show container status"
 	@echo "  destroy	destroy containers"
-	@echo "  test		run automated tests"
 	@echo ""
 	@echo "Choose one option!"
 
@@ -79,8 +79,10 @@ ps: ## show container status
 destroy: ## destroy containers
 	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_FILE) down -v
 .PHONY: test
-test: ## run unit tests for auth microservice
+test: ## run unit tests
 	docker exec -e RUN_ENV=test backend-$(BUILD_ENV) pytest -v
+testv: ## run unit tests with standard output on console
+	docker exec -e RUN_ENV=test backend-$(BUILD_ENV) pytest -s
 .PHONY: testcov
-testcov: ## run unit tests for auth microservice
+testcov: ## run unit tests overage report
 	docker exec -e RUN_ENV=test backend-$(BUILD_ENV) pytest --cov
