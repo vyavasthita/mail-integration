@@ -87,6 +87,23 @@ If invalid rule is provided in rule parser json file then application will exit.
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ## Design Goals
+### Multiple build environments
+An application should support multiple build environments which should be completely independent to each other.
+
+I have added support for multiple build environments.
+- development
+- qa
+- production
+
+We can switch between multiple environment just by exporting an environment variable. It's so easy.
+
+e.g. 
+  export BUILD_ENV development
+  or
+  export BUILD_ENV qa
+  or
+  export BUILD_ENV production
+
 ### Independent Components
 Application should be divided into multiple small components which do one particular task.
 This application is divided into few small components.
@@ -96,6 +113,8 @@ This application is divided into few small components.
     Fetches email content
     Parses email content
     Writes email content to database.
+
+![Mail Engine](images/mail_engine.png "Mail Engine")
 
 2. Rule Engine
     Reads selected rule from rules
@@ -131,7 +150,9 @@ This could be achieved by; -
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
+
 ## :art: Best Practices
+#### :white_check_mark: Use of Makefile to ease running various commands
 #### :white_check_mark: Different configurations for differnent environments like Dev, test, QA, Production.
 #### :white_check_mark: Use of context manager for db connection, gmail authentication
 #### :white_check_mark: Use of environment variables.
@@ -160,8 +181,7 @@ This could be achieved by; -
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-## Issues and Improvements
-### Known issues
+## Issues and Limitations
 - If you switch build environments from developement to qa etc, then;-
   Stop the containers
   Clean the containers
@@ -313,6 +333,7 @@ email_date(
 |-- Dockerfile.dev
 |-- Dockerfile.prod
 |-- Dockerfile.qa
+|-- LICENSE.txt
 |-- Makefile
 |-- README.md
 |-- configuration
@@ -328,20 +349,19 @@ email_date(
 |       |-- app_config.json
 |       |-- email_rules.json
 |       `-- logging.conf
-|-- credentials.json
 |-- database
 |   |-- development
-|   |   |-- data
+|   |   |-- data [error opening dir]
 |   |   `-- sqls
 |   |       |-- app_dev.sql
 |   |       `-- test_dev.sql
 |   |-- production
-|   |   |-- data
+|   |   |-- data [error opening dir]
 |   |   `-- sqls
 |   |       |-- app_production.sql
 |   |       `-- test_production.sql
 |   `-- qa
-|       |-- data
+|       |-- data [error opening dir]
 |       `-- sqls
 |           |-- app_qa.sql
 |           `-- test_qa.sql
@@ -359,10 +379,10 @@ email_date(
 |-- pytest.ini
 |-- src
 |   |-- __init__.py
-|   |-- __pycache__
 |   |-- api
 |   |   |-- __init__.py
-|   |   `-- api_request.py
+|   |   |-- api_request.py
+|   |   `-- http_status.py
 |   |-- auth
 |   |   |-- __init__.py
 |   |   |-- auth.py
@@ -395,20 +415,27 @@ email_date(
 |   |   `-- rule_validation.py
 |   `-- utils
 |       |-- __init__.py
-|       |-- __pycache__
 |       |-- api_logger.py
 |       |-- datetime_helper.py
 |       |-- file_helper.py
 |       |-- gen_credential_data.py
 |       `-- json_reader.py
-|-- tests
-|   |-- __init__.py
-|   |-- conftest.py
-|   `-- unit
-|       |-- __init__.py
-|       |-- __pycache__
-|       `-- test_api.py
-`-- token.json
+`-- tests
+    |-- __init__.py
+    |-- conftest.py
+    |-- integration
+    |   |-- schema
+    |   |   `-- any_predicate_rules_1.json
+    |   |-- test_mail_engine_fetch_labels.py
+    |   `-- test_rule_engine_any_predicate_rule.py
+    `-- unit
+        |-- __init__.py
+        |-- schema
+        |   |-- any_predicate_rules.json
+        |   |-- date_duration.csv
+        |   |-- match_query_string.csv
+        |   `-- table_column_info.csv
+        `-- test_query_builder.py
 ```
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
@@ -637,8 +664,8 @@ Go to following URL to see mysql database tables and data.
     
 
 <!-- Usage -->
-#### :eyes: Usage
-##### Starting Application
+### :eyes: Usage
+#### Starting Application
 
 This application runs as a part of command line utility.
 
@@ -649,9 +676,11 @@ This application runs as a part of command line utility.
 - It will print following output
 
    ```
-    2023-07-24 08:33:04,105 - src.utils.api_logger - INFO - Get the choice selected by user from command line.
+    2023-07-24 08:33:04,105 - src.utils.api_logger - 
+    INFO - Get the choice selected by user from command line.
     usage: mail_helper [-h]
-                    [-v | -a | -u | -e | -s {rule_1,rule_2,rule_3,all} | -ar {rule_1,rule_2,rule_3}]
+                    [-v | -a | -u | -e | -s {rule_1,rule_2,all} | 
+                    -ar {rule_1,rule_2,rule_3}]
 
     List the cmd parameters for mail helper
 
@@ -679,8 +708,8 @@ Out of above commands, following commands are optional and they are added just t
     -s  {choices}
 - Usages of various commands
 
-##### 1. Basic validations
-###### :pencil: This is an optional feature. 
+#### 1. Basic validations
+##### :pencil: This is an optional feature. 
 
 You can skip it, any way before running other commands, db validation will be checked.
 
@@ -694,8 +723,8 @@ This command will start a connection to database and then close it.
 If no exceptions are raised then we are good to proceed.
 If you see error messages that db connection failed, then request you to verify MYSQL environment
 variables in configuration/development/.env.app file.
-###### 2. OAuth2 with gmail api
-###### :pencil: This is an optional step. 
+#### 2. OAuth2 with gmail api
+##### :pencil: This is an optional step. 
 
 You can skip it, any way before running other commands, Oauth2 will be checked.
 
@@ -729,7 +758,7 @@ So first time when you ran it, token.json file was not present, hence it ask you
 
 When we run the auth flow again authorization will not be required.
 
-###### :pencil: Use the same gmail account which you configured for Oauth2 as per prerequisites step.
+##### :pencil: Use the same gmail account which you configured for Oauth2 as per prerequisites step.
 
 Tested this only in chrome browser.
 
@@ -737,8 +766,8 @@ If you rerun the flow again, it won't ask you to authorize again. This is one ti
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-###### 3. Un OAuth2 with gmail api
-###### :pencil: This is an optional step.
+#### 3. Un OAuth2 with gmail api
+##### :pencil: This is an optional step.
 
 You can skip it. This is just an extra features added to test auth multiple times if you wish.
 
@@ -755,8 +784,8 @@ This is just an helper command to you. It does not implement any feature.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-###### 4. Show rules
-###### :pencil: This is an optional step. 
+#### 4. Show rules
+##### :pencil: This is an optional step. 
 
 As per the buisness requirements, we need to define emails rules and actions.
 I have created a json file having all possible rules and actions.
@@ -820,8 +849,8 @@ Note: if you use any name other than the available rules in -h command, then you
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-###### 5. Fetch Emails
-###### :pencil: This is the first python script in our buisness requirement
+#### 5. Fetch Emails
+##### :pencil: This is the first python script in our buisness requirement
 
 As per the buisness requirements, we need to create an standalone script to fetch emails
 from gmail using OAuth.
@@ -839,8 +868,8 @@ This is the command to trigger fetching emails.
 
 Note: If we re run the commands then data will be overwritten in database.
 
-###### 6. Apply rules
-###### :pencil: This is the Second python script in our buisness requirement
+#### 6. Apply rules
+##### :pencil: This is the Second python script in our buisness requirement
 
 As per the buisness requirements, we need to read rules from a json file and apply those rules and 
 update email using rest api.
