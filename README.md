@@ -18,7 +18,7 @@
   <p align="center">
     Mail Integration Project!
     <br />
-    <a href="https://github.com/vyavasthita/mail-integration/blob/master/README.md"><strong>Explore the docs »</strong></a>
+    <a href="https://www.loom.com/share/ea483f1e7d274f8788617b3afae9a534?sid=7a798ff1-7e68-409e-8fe6-96a24e03c0e1"><strong>View Video Presentation»</strong></a>
     <br />
   </p>
 </div>
@@ -82,7 +82,9 @@ These permissions are defined like this.
 - Tested against Mysql InnoDB engine only.
 - Tested with root user of mysql db.
 - Tested auth flow with chrome browser only.
-- Automated unit tests have been written using pytest.
+- Not all labels types have been tested. 
+  There could be some limitations in gmail by moving a message to a particular label. For example, if we try to move message to 'CHAT' label (Even though CHAT is a valid label name), then it does not work and we get HTTP response 400 (BAD REQUEST). I could not find relevant documentation on rules of applying labels to email.
+  There could be more such scenario. And I have not tested all of such permutations and combinations as it requires understanding gmail api in detail which requires more time. 
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
@@ -232,7 +234,7 @@ This application is divided into few small components.
 ### Readable and Understandable
 - Software is meant for modification/improvements. Fellow developers should be able to understand the code.
 
-- This could be achieved by; -
+- This could be achieved by
     • Coding guidelines.
     • Comments/Description of classes and methods used.
     • Documentation (Doc string comments in Python), README document.
@@ -278,12 +280,17 @@ Python core -> Third party -> Application modules
 
   2. Downloading emails consuming lots of time. Hence performance is not good.
     Few options are available for performance improvement.
-    a. We might need to run multiple threads here to download bulk emails.
-    b. Need to improve performance by using google async api named 'aiogoogle'.
+    - We might need to run multiple threads here to download bulk emails.
+    - Need to improve performance by using google async api named 'aiogoogle'.
 
-  3. Email rules json file is not validated and if invalid data is present, we will get unexpected results.
+  3. When we apply move to INBOX action on a message, which is currently under CATEGORY_PROMOTIONS label,
+     then it fails. For this to work we need to also remove CATEGORY_PROMOTIONS label from that message. This particular message had other labels also but only we need to remove this CATEGORY_PROMOTIONS label to move it to INBOX. I did not implement this check because
+     I did not find clear explanation on this on any of google api documentation. And if I had applied something based on assumptions,
+     then something else would have broken. Now there could be other similar condition.
 
-  4. Database tables could be design better. 
+  4. Email rules json file is not validated and if invalid data is present, we will get unexpected results.
+
+  5. Database tables could be designed better.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
@@ -644,29 +651,32 @@ To run this project, you need to configure environment variables and configurati
 
     Update values of below environments from your credential.json file which you must have download from gmail.
 
-    **CLIENT_ID_APP**
-    **PROJECT_ID_APP**
-    **AUTH_URI_APP**
-    **TOKEN_URI_APP**
-    **AUTH_PROVIDER_X509_CERT_URL_APP**
-    **CLIENT_SECRET_APP**
-    **REDIRECT_URIS_APP**
-    **API_URL_APP**
-
+    ```sh
+    CLIENT_ID_APP
+    PROJECT_ID_APP
+    AUTH_URI_APP
+    TOKEN_URI_APP
+    AUTH_PROVIDER_X509_CERT_URL_APP
+    CLIENT_SECRET_APP
+    REDIRECT_URIS_APP
+    API_URL_APP
+    ```
   - Update '.env.test' 
   
     Following variables in '.env.test' should be available to you as part of enabling gmail app (as mentioned in prerequisite step).
 
     Update values of below environments from your credential.json file which you must have download from gmail.
 
-    **CLIENT_ID_TEST**
-    **PROJECT_ID_TEST**
-    **AUTH_URI_TEST**
-    **TOKEN_URI_TEST**
-    **AUTH_PROVIDER_X509_CERT_URL_TEST**
-    **CLIENT_SECRET_TEST**
-    **REDIRECT_URIS_TEST**
-    **API_URL_TEST**
+    ```sh
+    CLIENT_ID_TEST
+    PROJECT_ID_TEST
+    AUTH_URI_TEST
+    TOKEN_URI_TEST
+    AUTH_PROVIDER_X509_CERT_URL_TEST
+    CLIENT_SECRET_TEST
+    REDIRECT_URIS_TEST
+    API_URL_TEST
+    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

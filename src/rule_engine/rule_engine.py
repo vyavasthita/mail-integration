@@ -99,7 +99,9 @@ class RuleEngine:
         status = api_request.update_label(result_set, self.action_data)
 
         if status == HttpStatus.HTTP_200_OK or status == HttpStatus.HTTP_204_NO_CONTENT:
-            ApiLogger.log_info("Labels updated successfully")
+            ApiLogger.log_info(
+                f"Labels updated successfully for {len(result_set)} records."
+            )
         elif status == HttpStatus.HTTP_400_BAD_REQUEST:
             ApiLogger.log_error("Failed to update labels. Bad request.")
         elif status == HttpStatus.HTTP_404_NOT_FOUND:
