@@ -638,28 +638,39 @@ To run this project, you need to configure environment variables and configurati
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 4. Update .env files
-    - Update '.env.app' and '.env.test' files.
-    
-    Following variables in '.env.app' and '.env.test' should be available to you as part of enabling gmail app (as mentioned in prerequisite step).
+  - Update '.env.app' 
+  
+    Following variables in '.env.app' should be available to you as part of enabling gmail app (as mentioned in prerequisite step).
 
     Update values of below environments from your credential.json file which you must have download from gmail.
 
-    `CLIENT_ID_APP`=<str>
-    `PROJECT_ID_APP`=<str>
-    `AUTH_URI_APP`=<str>
-    `TOKEN_URI_APP`=<str>
-    `AUTH_PROVIDER_X509_CERT_URL_APP`=<str>
-    `CLIENT_SECRET_APP`=<str>
-    `REDIRECT_URIS_APP`=<str>
-    `API_URL_APP`=<str>
+    **CLIENT_ID_APP**
+    **PROJECT_ID_APP**
+    **AUTH_URI_APP**
+    **TOKEN_URI_APP**
+    **AUTH_PROVIDER_X509_CERT_URL_APP**
+    **CLIENT_SECRET_APP**
+    **REDIRECT_URIS_APP**
+    **API_URL_APP**
+
+  - Update '.env.test' 
+  
+    Following variables in '.env.test' should be available to you as part of enabling gmail app (as mentioned in prerequisite step).
+
+    Update values of below environments from your credential.json file which you must have download from gmail.
+
+    **CLIENT_ID_TEST**
+    **PROJECT_ID_TEST**
+    **AUTH_URI_TEST**
+    **TOKEN_URI_TEST**
+    **AUTH_PROVIDER_X509_CERT_URL_TEST**
+    **CLIENT_SECRET_TEST**
+    **REDIRECT_URIS_TEST**
+    **API_URL_TEST**
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-5. Paste the contents to  '.env.sample' in this development directory
-
-    Rename '.env.sample' to '.env.app'
-
-6. Update App Configuration (If required)
+5. Update App Configuration (If required)
     In the current directory 'configuration/development' open 'app_config.json'.
 
     In the 'message' key, you can update 'max_email_read' and 'labels' as per your requirements.
@@ -673,7 +684,7 @@ To run this project, you need to configure environment variables and configurati
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
    
-7. Update email rules json file
+6. Update email rules json file
 
     All the email rules, as per the requirements, are added in a json file
 
@@ -689,19 +700,20 @@ To run this project, you need to configure environment variables and configurati
 
     - Under key 'conditions', you can add N number of rules by adding more json.
       Each Field has an attribute 'code' associated with it. Following are the codes associated with fields.
-
+    ```sh
       field: From -> Code: 1
       field: To -> Code: 2
       field: Subject -> Code: 3
       field: Message -> Code: 4
       field: Date received -> Code: 5
-
+    ```
       Application is using these code (not field names) values to determine which condition to apply. And hence while adding/updating conditions, you need to make sure the value of code is given correctly as intended otherwise unexpected result may be encountered.
 
       It is perfectly fine to repeat a code twice (But make sure 'code' value is same in this case). Following condition is a valid one. This is applicable when predicate value is 'any', but for predicate 'all' duplicate condition may not yield any result.
 
         Below rule will fetch all those emails having word 'interviews' in subject plus those rules not having 'hello' in subject.
 
+    ```sh
         {
             "field": "Subject",
             "code": 3,
@@ -721,9 +733,8 @@ To run this project, you need to configure environment variables and configurati
                 "name": "Does not contain",
                 "value": "hello"
             }
-        },
-
-
+        }
+    ```
       Note: No validation is done to check if you entered a wrong code value say 50 or -1.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
@@ -736,7 +747,7 @@ Now you are ready to start the application
 1. Go back to project root directory 'mail-integration'.
    
    ```sh
-   cd ..
+   cd ../..
    ```
 
 2. Start containers
@@ -755,6 +766,10 @@ Go to following URL to see mysql database tables and data.
 ```bash
   http://127.0.0.1:8080/
 ```
+
+You can see, two databases will be created.
+- mails_<environment_name>
+- testdb_<environment_name>
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
     
@@ -797,14 +812,16 @@ This application runs as a part of command line utility.
     Thanks for using mail_helper! :)
    ```
 Out of above commands, following commands are optional and they are added just to simplify your life.
+```bash
     -v, --validate
     -a, --auth
     -u, --unauth
     -s  {choices}
-- Usages of various commands
+```
+#### Usages of various commands
 
-#### 1. Basic validations
-##### :pencil: This is an optional feature. 
+##### 1. Basic validations
+###### :pencil: This is an optional feature. 
 
 You can skip it, any way before running other commands, db validation will be checked.
 
@@ -818,8 +835,8 @@ This command will start a connection to database and then close it.
 If no exceptions are raised then we are good to proceed.
 If you see error messages that db connection failed, then request you to verify MYSQL environment
 variables in configuration/development/.env.app file.
-#### 2. OAuth2 with gmail api
-##### :pencil: This is an optional step. 
+##### 2. OAuth2 with gmail api
+###### :pencil: This is an optional step. 
 
 You can skip it, any way before running other commands, Oauth2 will be checked.
 
@@ -861,8 +878,8 @@ If you rerun the flow again, it won't ask you to authorize again. This is one ti
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-#### 3. Un OAuth2 with gmail api
-##### :pencil: This is an optional step.
+##### 3. Un OAuth2 with gmail api
+###### :pencil: This is an optional step.
 
 You can skip it. This is just an extra features added to test auth multiple times if you wish.
 
@@ -879,14 +896,14 @@ This is just an helper command to you. It does not implement any feature.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-#### 4. Show rules
-##### :pencil: This is an optional step. 
+##### 4. Show rules
+###### :pencil: This is an optional step. 
 
 As per the buisness requirements, we need to define emails rules and actions.
 I have created a json file having all possible rules and actions.
 This json file is present in following directory;-
 
-./configuration/development/email_rules.json
+**./configuration/development/email_rules.json**
 
 This file contains a list of rules. Each rule having a name with key 'rule'.
 Now when we want to run the other commands to download email or apply rules, we need to choose one among
@@ -897,7 +914,7 @@ So this command is just for viewing and verification purpose that what all the r
 
 Also please not that when you previously run command with '-h' arument, you saw output like this
 
--s {rule_1,rule_2,rule_3,all}
+**-s {rule_1,rule_2,rule_3,all}**
 
 As you can see, 'rule_1', 'rule_2' etc. are the name of the available rules from email_rules.json. So the application is intelligent enough to provide you the available rules to choose from.
 
@@ -944,8 +961,8 @@ Note: if you use any name other than the available rules in -h command, then you
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-#### 5. Fetch Emails
-##### :pencil: This is the first python script in our buisness requirement
+##### 5. Fetch Emails
+###### :pencil: This is the first python script in our buisness requirement
 
 As per the buisness requirements, we need to create an standalone script to fetch emails
 from gmail using OAuth.
@@ -960,11 +977,12 @@ This is the command to trigger fetching emails.
 ```bash
   docker exec backend-development python mail_helper.py -e
 ```
+After execution is over, you can go and check 'mails_development' database to see email data.
 
 Note: If we re run the commands then data will be overwritten in database.
 
-#### 6. Apply rules
-##### :pencil: This is the Second python script in our buisness requirement
+##### 6. Apply rules
+###### :pencil: This is the Second python script in our buisness requirement
 
 As per the buisness requirements, we need to read rules from a json file and apply those rules and 
 update email using rest api.
@@ -1004,8 +1022,10 @@ Workaround to this is, use below command to run unit tests (Verbose mode), which
 And here you can copy the auth url and provide authorization.
 
 ```bash
-  make testv
+make testv
 ```
+But if you have already done authrorization earlier, no need to run 'make testv' command.
+
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 <!-- Tests Coverage -->

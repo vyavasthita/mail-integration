@@ -10,7 +10,7 @@
         ]
     },
     "message": {
-        "max_email_read": 100,
+        "max_email_read": 1000,
         "labels": []
     }
 }

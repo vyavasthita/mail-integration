@@ -283,7 +283,7 @@ class MailHelper:
         """
         Do necessary clean up required.
         """
-        delete_file("credentials.json")
+        pass  # TBD
 
 
 if __name__ == "__main__":
