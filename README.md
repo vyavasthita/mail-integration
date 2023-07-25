@@ -60,29 +60,95 @@ Softwares/libraries used in this project.
 - Python 3.10
 
 ### Assumptions
+- Before using the application, user is going to enable gmail api from google workspace and download the credentials. 
+- User is going to allow readonly and modify permissions in gmail api to let this application read and write data to email.
+These permissions are defined like this.
+```
+"https://www.googleapis.com/auth/gmail.readonly",
+"https://www.googleapis.com/auth/gmail.modify"
+```
 - We can not have multiple rules (with same field) defined in json file.
-  E.g. we can not have two 'From' fields in our json rules.
-- Every time we run the script to fetch the emails, we download the all requested emails
-  and update/overwrite the date if email is duplicate.
+  e.g. we can not have two 'From' fields in our json rules.
+- Every time we run the script to fetch the emails, we download all requested emails.
+- Everytime we run the script to apply rules, we overwrite the labels in gmail.
+- As email rules in json are not validated, it is assumed user is going to put correct details in rules json file.
 
 ### Scope
+- Tested with docker environment only on Ubuntu 22.04 LTS host system.
+- Tested with single gmail account only.
+- Tested with maximum 250 emails only.
 - Tested with english language search only.
 - Tested without special characters search.
 - Tested against Mysql InnoDB engine only.
+- Tested with root user of mysql db.
+- Tested auth flow with chrome browser only.
 - Automated unit tests have been written using pytest.
-- If email script is run again, it will update the database.
-- We can fetch emails by providing list of labels in config/<environment>/app_config.json
+
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ### Email Rules
 I have created one email_rules.json file having all rules to apply and the actions
 to take on those rules.
 
+- We can fetch emails by providing list of labels in config/<environment>/email_rules.json
+
+User can edit this rules file by modifying it or adding or removing rules and actions.
+
 ### :pencil: Notes
-Application is tested with root user of mysql db.
+
+Important points about this email_rules.json file;-
+
+1. Field
+
+- All the fields under condition have been given a particular code.
+  User must use the intended code before running the application.
+
+Json path -> root/conditions/{condition}/field
+
+| Field | Code |
+| --- | --- |
+| `From` | **1** |
+| `To` | **2** |
+| `Subject` | **3** |
+| `Message` | **4** |
+| `Date Received` | **5** |
+
+2. Predicate
+
+- All the predicate under condition have been given a particular code.
+  User must use the intended code before running the application.
+
+Json path -> root/conditions/{condition}/predicate
+
+| Predicate | Code |
+| --- | --- |
+| `Contains` | **1** |
+| `Does not contain` | **2** |
+| `Equals` | **3** |
+| `Does not Equal` | **4** |
+| `Is less than` | **5** |
+| `Is greator than` | **6** |
+
+3. Action
+
+- All the actions have been given a particular code.
+  User must use the intended code before running the application.
+
+Json path -> root/actions/{action}
+
+| Action | Code |
+| --- | --- |
+| `Move` | **1** |
+| `Read` | **2** |
+| `Unread` | **3** |
+
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ### Validations done
-If invalid rule is provided in rule parser json file then application will exit.
-01. Not connected to database
+Application will exit on following conditions.
+- If invalid command line arugment is passed
+- Application is not connected to database.
+- Authentication fails.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
@@ -95,39 +161,60 @@ I have added support for multiple build environments.
 - qa
 - production
 
-We can switch between multiple environment just by exporting an environment variable. It's so easy.
+We can switch between multiple environment sjust by exporting an environment variable. It's so easy.
 
-e.g. 
+  ```
   export BUILD_ENV development
+  ```
   or
+  ```
   export BUILD_ENV qa
+  ```
   or
+  ```
   export BUILD_ENV production
+  ```
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ### Independent Components
 Application should be divided into multiple small components which do one particular task.
 This application is divided into few small components.
 
 1. Mail Engine
-    Connects with gmail api
-    Fetches email content
-    Parses email content
+    Connects with gmail api.
+    Fetches email content.
+    Parses email content.
     Writes email content to database.
 
 ![Mail Engine](images/mail_engine.png "Mail Engine")
 
 2. Rule Engine
-    Reads selected rule from rules
-    Generates Query based on rules
-    Generates Actions based on rules
-    Reads data from database based on query
+    Reads selected rule from rules.
+    Generates Query based on rules.
+    Generates Actions based on rules.
+    Reads data from database based on query.
     Updates Mail Server through RestAPIs.
 
 ![Rule Engine](images/rule_engine.png "Rule Engine")
 
 3. Api 
-    Connects with gmail api over REST
-    Update email label
+    Connects with gmail api over REST.
+    Update email label.
+
+4. Auth
+    Authenticates to gmail using Oauth2.
+
+5. data_layer
+    Data Access layer between other python components and database.
+    All communication to database happens through this layer.
+
+6. utils
+    Utility functions common to all other modules.
+
+7. config
+    Reads configuration data which is shared across application.
+
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ### Simplicity
 Source code and Database table structure should be less complex or say should be simple to understand.
@@ -136,15 +223,16 @@ I have followed all possible best practices to make code structure simple.
 ### Design Patterns
 Single Responsibility design pattern of SOLID principle is followed.
 Each class does one thing only.
-Singletone design pattern is followed.
+Singletone design pattern is followed for python logging.
 
 ### Flexible
 Ability of the application to adapt and evolve to accommodate new requirements without affecting the existing operations. 
 
-This application is modularized into small python modules which allow us to add new requirements.
+This application is modularized into small python modules which allow us to add new requirements or modify existing ones.
 
 ### Readable and Understandable
 Software is meant for modification/improvements. Fellow developers should be able to understand the code.
+
 This could be achieved by; -
     • Coding guidelines.
     • Comments/Description of classes and methods used.
@@ -155,44 +243,48 @@ This could be achieved by; -
 
 ## :art: Best Practices
 #### :white_check_mark: Use of Makefile to ease running various commands
-#### :white_check_mark: Different configurations for differnent environments like Dev, test, QA, Production.
+#### :white_check_mark: Docker with docker compose used
+#### :white_check_mark: Different configurations for differnent environments like Dev, test, QA, Production
+#### :white_check_mark: Manual steps are minimal while testing the app. Make file and docker compose help us in achieving this
+#### :white_check_mark: Proper directory and file structure of source code
+#### :white_check_mark: Applicationi is modularized into small logical components.
 #### :white_check_mark: Use of context manager for db connection, gmail authentication
-#### :white_check_mark: Use of environment variables.
-#### :white_check_mark: DB transactions are used while inserting data into database support Atomicity.
-#### :white_check_mark: Poetry for managing different environments
+#### :white_check_mark: Use of decorators, dataclasses
+#### :white_check_mark: Use of environment variables
+#### :white_check_mark: DB transactions are used while inserting data into database support Atomicity
+#### :white_check_mark: Poetry for managing different run environments
 #### :white_check_mark: Normalized DB Schema with Full text search index for pattern matching
+#### :white_check_mark: For code formatting black and flake8 packages are used. 
 #### :white_check_mark: Python Logging - Console and File with proper log level
 #### :white_check_mark: Use of exception handling
 #### :white_check_mark: Doc string added for all modules and methods
-#### :white_check_mark: Type annotations are added for all methods.
-#### :white_check_mark: Docker with docker compose used.
+#### :white_check_mark: Type annotations are added for all methods
 #### :white_check_mark: Unit tests with coverage report
-#### :white_check_mark: Detailed README file.
-#### :white_check_mark: Proper git commit messages. Every commit is done post completing a functionality.
-#### :white_check_mark: Pep8 naming convention for modules, classes, methods, functions and variables.
-#### :white_check_mark: Comments added wherever required.
-#### :white_check_mark: Use of decorators, dataclasses.
+#### :white_check_mark: Proper git commit messages. Every commit is done post completing a functionality
+#### :white_check_mark: Pep8 naming convention for modules, classes, methods, functions and variables
+#### :white_check_mark: Comments added wherever required
 #### :white_check_mark: Python Logging
-#### :white_check_mark: Use of Makefile to each in using the application.
-#### :white_check_mark: Manual steps are minimal while testing the app.
-#### :white_check_mark: Proper directory and file structure of source code.
-#### :white_check_mark: Import statements are in order.
-#### :white_check_mark: Python core -> Third party -> Application modules
-
-#### :white_check_mark: For code formatting black and flake8 packages are used. 
+#### :white_check_mark: Import statements are in order
+                        Python core -> Third party -> Application modules
+#### :white_check_mark: Detailed README file
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 ## Issues and Limitations
-- If you switch build environments from developement to qa etc, then;-
-  Stop the containers
-  Clean the containers
-  Start the containers
-  While parsing emails, only the message snippet is used not the complete body. 
-  This snippet is only the first 200 characters from the message body. 
-  Due to this some of the emails may not get filtered where field type is 'message'.
-  This limitation is due to the fact that message body may content images, htmls, text with any such combination.
-  Understanding this required more time and hence I did not implement this feature.
+  1. While parsing emails, only the message snippet is used not the complete body. 
+    This snippet is only the first 200 characters from the message body. 
+    Due to this some of the emails may not get filtered where field type is 'message'.
+    This limitation is due to the fact that message body may content images, htmls, text with any such combination.
+    Understanding this required more time and hence I did not implement this feature.
+
+  2. Downloading emails consuming lots of time. Hence performance is not good.
+    Few options are available for performance improvement.
+    a. We might need to run multiple threads here to download bulk emails.
+    b. Need to improve performance by using google async api named 'aiogoogle'.
+
+  3. Email rules json file is not validated and if invalid data is present, we will get unexpected results.
+
+  4. Database tables could be design better. 
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
@@ -278,15 +370,6 @@ CREATE TABLE IF NOT EXISTS email(
     PRIMARY KEY (message_id)
 );
 
-email_label(
-    id int NOT NULL AUTO_INCREMENT,  
-    label_id varchar(25) NOT NULL,
-    message_id varchar(25) NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (label_id) REFERENCES label(label_id),
-    FOREIGN KEY (message_id) REFERENCES email(message_id)
-);
-
 email_sender(  
     message_id varchar(25) NOT NULL,
     sender varchar(255) NOT NULL,
@@ -351,6 +434,7 @@ email_date(
 |       |-- app_config.json
 |       |-- email_rules.json
 |       `-- logging.conf
+|-- credentials.json
 |-- database
 |   |-- development
 |   |   |-- data [error opening dir]
@@ -373,7 +457,11 @@ email_date(
 |-- docker-compose.qa.yaml
 |-- entrypoint.sh
 |-- images
-|   `-- logo.png
+|   |-- logo.png
+|   |-- mail_engine.png
+|   |-- mail_engine.xml
+|   |-- rule_engine.png
+|   `-- rule_engine.xml
 |-- mail_helper.py
 |-- poetry.lock
 |-- poetry.toml
@@ -428,7 +516,7 @@ email_date(
     |-- integration
     |   |-- schema
     |   |   `-- any_predicate_rules_1.json
-    |   |-- test_mail_engine_fetch_labels.py
+    |   |-- test_mail_engine_fetch_emails.py
     |   `-- test_rule_engine_any_predicate_rule.py
     `-- unit
         |-- __init__.py
@@ -439,7 +527,6 @@ email_date(
         |   `-- table_column_info.csv
         `-- test_query_builder.py
 ```
-
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
 <!-- Getting Started -->
@@ -470,6 +557,14 @@ Follow below steps to install the app.
     https://console.cloud.google.com/apis/dashboard
     https://developers.google.com/gmail/api/quickstart/python
     ```
+
+    Note: You need to provide readonly and modify access to let the application talk to gmail.
+
+e.g. 
+   ```sh
+    https://www.googleapis.com/auth/gmail.readonly
+    https://www.googleapis.com/auth/gmail.modify
+   ```
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
@@ -664,7 +759,6 @@ Go to following URL to see mysql database tables and data.
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
     
-
 <!-- Usage -->
 ### :eyes: Usage
 #### Starting Application
@@ -889,6 +983,8 @@ This is the command to trigger fetching emails.
 
 Replace <rule_name> with a name from email_rules.json. E.g. 'rule_3'.
 
+<p align="right">(<a href="#readme-top">Back To Top</a>)</p>
+
 <!-- Running Tests -->
 ### :test_tube: Running Tests
 
@@ -948,7 +1044,6 @@ Only thing to be done is update the configuration for qa environment in below pa
 ```
 configuration/qa
 ```
-
 - Update .env.app and .env.qa as done in development environment
 
 - Set BUILD_ENV
@@ -1034,14 +1129,13 @@ TBD
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
-
 <!-- Roadmap -->
 # :compass: Roadmap
 
 I have used Full Text Search Indexes for searching the patterns.
 
 It has some limitations;-
-- [x] Full text indexes are created post insertions for performance reasons.
+- [ ] Full text indexes are created post insertions for performance reasons.
     Some words which are not searched.
         Ref: https://dev.mysql.com/doc/refman/8.1/en/fulltext-stopwords.html
     
@@ -1051,17 +1145,16 @@ It has some limitations;-
         Ref: https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html
 
 Some improvements are required, these are intentionly not done due to time constraints.
-- [ ] Json rule validation is not done.
+
 Searching/contains with special characters not tested.
-7. More automated unit tests need to be written specially for db crud operations and also by using mocking.
 
-8. Unit test coverage should improve.
+- [ ] More automated unit, integration and api tests need to be written specially for db crud operations and also by using mocking.
 
-10. Use some profiling tools to check performance
+- [ ] Unit test coverage should improve.
 
-11. Use sphinx documentation
-Validating json files.
+- [ ] Use some profiling tools to check performance
 
+- [ ] Use sphinx documentation
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
@@ -1073,7 +1166,6 @@ Validating json files.
 </a>
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
-
 
 <!-- Code of Conduct -->
 ### :scroll: Code of Conduct
