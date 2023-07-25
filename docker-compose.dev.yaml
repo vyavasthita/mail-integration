@@ -1,0 +1,49 @@
+version: '3'
+services:
+  mysql-db-development:
+    image: mysql:8.0.29
+    container_name: mysql-db-development
+    ports:
+      - "3308:3306"
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    # command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./database/development/sqls:/docker-entrypoint-initdb.d
+      - ./database/development/data:/var/lib/mysql
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 3s
+        retries: 5
+    networks: 
+      - mail-integration-development
+  db-admin-development:    
+    image: phpmyadmin:latest
+    container_name: mysql-db-admin-development
+    restart: always
+    environment:
+      PMA_HOST: mysql-db-development
+      PMA_USER: root
+    ports:      
+      - "8080:80"
+    depends_on:
+      mysql-db-development:
+        condition: service_healthy
+    networks: 
+      - mail-integration-development
+  backend-development:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: backend-development
+    ports:
+      - 8181:8181
+    depends_on:
+      mysql-db-development:
+        condition: service_healthy
+    environment:
+      - BUILD_ENV=development
+    networks: 
+      - mail-integration-development
+networks:
+  mail-integration-development:

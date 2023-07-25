@@ -1,0 +1,5 @@
+[run]
+source = src, utils, mail_helper.py
+omit = tests/*, __init__.py
+show_missing = True
+skip_covered = True

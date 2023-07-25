@@ -1,0 +1,4 @@
+column,predicate_value,query
+sender,Naukri,MATCH (sender) AGAINST ('"Naukri"' IN BOOLEAN MODE)
+subject,Mail Integration,MATCH (subject) AGAINST ('"Mail Integration"' IN BOOLEAN MODE)
+content,first second third,MATCH (content) AGAINST ('"first second third"' IN BOOLEAN MODE)

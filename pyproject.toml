@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "mail-integration"
+version = "1.0.0"
+description = "Python scripts that integrates with Gmail API and performs some rule based operations on emails"
+authors = ["Dilip Kumar Sharma <diliplakshya@gmail.com>"]
+readme = "README.md"
+packages = [{include = "mail_integration"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.core.dependencies]
+python-dotenv = "^1.0.0"
+google-api-python-client = "^2.94.0"
+google-auth-httplib2 = "^0.1.0"
+google-auth-oauthlib = "^1.0.0"
+beautifulsoup4 = "^4.12.2"
+lxml = "^4.9.3"
+mysql-connector-python = "^8.1.0"
+python-dateutil = "^2.8.2"
+requests = "^2.31.0"
+requests-oauthlib = "^1.3.1"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+flake8 = "^6.0.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+pytest-mock = "^3.11.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

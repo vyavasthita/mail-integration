@@ -1,0 +1,49 @@
+version: '3'
+services:
+  mysql-db-qa:
+    image: mysql:8.0.29
+    container_name: mysql-db-qa
+    ports:
+      - "3309:3306"
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./database/qa/data:/var/lib/mysql
+      - ./database/qa/sqls/app_qa.sql:/docker-entrypoint-initdb.d/app_qa.sql
+      - ./database/qa/sqls/test_qa.sql:/docker-entrypoint-initdb.d/test_qa.sql
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 3s
+        retries: 5
+    networks: 
+      - mail-integration-qa
+  db-admin-qa:    
+    image: phpmyadmin:latest
+    container_name: mysql-db-admin-qa
+    restart: always
+    environment:
+      PMA_HOST: mysql-db-qa
+      PMA_USER: root
+    ports:      
+      - "8080:80"
+    depends_on:
+      mysql-db-qa:
+        condition: service_healthy
+    networks: 
+      - mail-integration-qa
+  backend-qa:
+    build:
+      context: .
+      dockerfile: Dockerfile.qa
+    container_name: backend-qa
+    ports:
+      - 8181:8181
+    depends_on:
+      mysql-db-qa:
+        condition: service_healthy
+    environment:
+      - BUILD_ENV=qa
+    networks: 
+      - mail-integration-qa
+networks: 
+  mail-integration-qa:

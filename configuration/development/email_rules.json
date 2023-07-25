@@ -1,0 +1,254 @@
+[
+    {
+        "rule": "rule_1",
+        "predicate": "all",
+        "conditions": [
+            {
+                "field": "From",
+                "code": 1,
+                "predicate": {
+                    "type": "str",
+                    "code": 1,
+                    "name": "contains",
+                    "value": "interviews"
+                }
+            },
+            {
+                "field": "To",
+                "code": 2,
+                "predicate": {
+                    "type": "str",
+                    "code": 2,
+                    "name": "Does not contain",
+                    "value": "gmail.com"
+                }
+            },
+            {
+                "field": "Subject",
+                "code": 3,
+                "predicate": {
+                    "type": "str",
+                    "code": 3,
+                    "name": "Equals",
+                    "value": "Interview"
+                }
+            },
+            {
+                "field": "Message",
+                "code": 4,
+                "predicate": {
+                    "type": "str",
+                    "code": 4,
+                    "name": "Does not equal",
+                    "value": "Scheduled"
+                }
+            },
+            {
+                "field": "Date Received",
+                "code": 5,
+                "predicate": {
+                    "type": "date",
+                    "code": 5,
+                    "name": "is less than",
+                    "duration": "days",
+                    "value": 2
+                }
+            },
+            {
+                "field": "Date Received",
+                "code": 5,
+                "predicate": {
+                    "type": "date",
+                    "code": 6,
+                    "name": "is greator than",
+                    "duration": "months",
+                    "value": 1
+                }
+            }
+        ],
+        "actions": [
+            {
+                "code": 1,
+                "name": "Move",
+                "label": "INBOX"
+            },
+            {
+                "code": 2,
+                "name": "Read",
+                "label": "READ"
+            },
+            {
+                "code": 3,
+                "name": "Unread",
+                "label": "UNREAD"
+            }
+        ]
+    },
+    {
+        "rule": "rule_2",
+        "predicate": "any",
+        "conditions": [
+            {
+                "field": "From",
+                "code": 1,
+                "predicate": {
+                    "type": "str",
+                    "code": 1,
+                    "name": "contains",
+                    "value": "tenmiles.com"
+                }
+            },
+            {
+                "field": "To",
+                "code": 2,
+                "predicate": {
+                    "type": "str",
+                    "code": 3,
+                    "name": "Equals",
+                    "value": "www.amazon.com"
+                }
+            },
+            {
+                "field": "Subject",
+                "code": 3,
+                "predicate": {
+                    "type": "str",
+                    "code": 2,
+                    "name": "Does not contain",
+                    "value": "Interview"
+                }
+            },
+            {
+                "field": "Message",
+                "code": 4,
+                "predicate": {
+                    "type": "str",
+                    "code": 4,
+                    "name": "Does not equal",
+                    "value": "Scheduled"
+                }
+            },
+            {
+                "field": "Date Received",
+                "code": 5,
+                "predicate": {
+                    "type": "date",
+                    "code": 5,
+                    "name": "is less than",
+                    "duration": "months",
+                    "value": 1
+                }
+            },
+            {
+                "field": "Date Received",
+                "code": 5,
+                "predicate": {
+                    "type": "date",
+                    "code": 6,
+                    "name": "is greator than",
+                    "duration": "days",
+                    "value": 11
+                }
+            }
+        ],
+        "actions": [
+            {
+                "code": 1,
+                "name": "Move",
+                "label": "CATEGORY_PROMOTIONS"
+            },
+            {
+                "code": 3,
+                "name": "Unread",
+                "label": "UNREAD"
+            }
+        ]
+    },
+    {
+        "rule": "rule_4",
+        "predicate": "all",
+        "conditions": [
+            {
+                "field": "From",
+                "code": 1,
+                "predicate": {
+                    "type": "str",
+                    "code": 1,
+                    "name": "contains",
+                    "value": "interviews"
+                }
+            },
+            {
+                "field": "Subject",
+                "code": 3,
+                "predicate": {
+                    "type": "str",
+                    "code": 1,
+                    "name": "contains",
+                    "value": "UPDATED"
+                }
+            },
+            {
+                "field": "Date Received",
+                "code": 5,
+                "predicate": {
+                    "type": "date",
+                    "code": 6,
+                    "name": "is less than",
+                    "duration": "days",
+                    "value": 5
+                }
+            }
+        ],
+        "actions": [
+            {
+                "code": 1,
+                "name": "move",
+                "label": "INBOX"
+            },
+            {
+                "code": 2,
+                "name": "Unread",
+                "label": "READ"
+            }
+        ]
+    },
+    {
+        "rule": "rule_5",
+        "predicate": "all",
+        "conditions": [
+            {
+                "field": "From",
+                "code": 1,
+                "predicate": {
+                    "type": "str",
+                    "code": 2,
+                    "name": "does not contain",
+                    "value": "Scheduled"
+                }
+            },
+            {
+                "field": "Subject",
+                "code": 3,
+                "predicate": {
+                    "type": "str",
+                    "code": 1,
+                    "name": "contains",
+                    "value": "Confirmation email"
+                }
+            }
+        ],
+        "actions": [
+            {
+                "code": 1,
+                "name": "move",
+                "label": "INBOX"
+            },
+            {
+                "code": 2,
+                "name": "Read",
+                "label": "READ"
+            }
+        ]
+    }
+]

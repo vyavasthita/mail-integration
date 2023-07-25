@@ -1,0 +1,49 @@
+version: '3'
+services:
+  mysql-db-production:
+    image: mysql:8.0.29
+    container_name: mysql-db-production
+    ports:
+      - "3310:3306"
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./database/production/data:/var/lib/mysql
+      - ./database/production/sqls/app_production.sql:/docker-entrypoint-initdb.d/app_production.sql
+      - ./database/production/sqls/test_production.sql:/docker-entrypoint-initdb.d/test_production.sql
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 3s
+        retries: 5
+    networks: 
+      - mail-integration-production
+  db-admin-production:    
+    image: phpmyadmin:latest
+    container_name: mysql-db-admin-production
+    restart: always
+    environment:
+      PMA_HOST: mysql-db-production
+      PMA_USER: root
+    ports:
+      - "8080:80"
+    depends_on:
+      mysql-db-production:
+        condition: service_healthy
+    networks: 
+      - mail-integration-production
+  backend-production:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: backend-production
+    ports:
+      - 8181:8181
+    depends_on:
+      mysql-db-production:
+        condition: service_healthy
+    environment:
+      - BUILD_ENV=production
+    networks: 
+      - mail-integration-production
+networks: 
+  mail-integration-production:
