@@ -45,7 +45,7 @@ Softwares/libraries used in this project.
 
 * [![Python][Python]][Python-url]
 * [![Docker][Docker]][Docker-url]
-* [![Docker Compose][Docker]][Docker-Compose-url]
+* [![DockerCompose][DockerCompose]][Docker-Compose-url]
 * [![Makefile][Makefile]][Makefile-url]
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
@@ -1230,12 +1230,12 @@ TBD
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/diliplakshya/
 [product-screenshot]: images/screenshot.png
-[Python]: https://img.shields.io/badge/Python-000000?style=for-the-badge&logo=python&logoColor=white
+[Python]: https://img.shields.io/badge/Python-blue?style=for-the-badge&logo=python&logoColor=white
 [Python-url]: https://www.python.org/
 [Docker]: https://img.shields.io/badge/Docker-4A4A55?style=for-the-badge&logo=docker&logoColor=FF3E00
 [Docker-url]: https://www.docker.com/
 [linkedin-url]: https://www.linkedin.com/in/diliplakshya/
-[Docker Compose]: https://img.shields.io/badge/-Docker%20Compose-blue?logo=docker&logoColor=white&style=for-the-badge
+[DockerCompose]: https://img.shields.io/badge/-Docker%20Compose-blue?logo=docker&logoColor=white&style=for-the-badge
 [Docker-Compose-url]: https://docs.docker.com/compose/
 [Makefile]: https://img.shields.io/badge/-makefile-red?logo=gnu&logoColor=white&style=for-the-badge
 [Makefile-url]: https://www.gnu.org/software/make/
