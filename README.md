@@ -391,7 +391,7 @@ Take example of below json rule.
         "code": 5,
         "predicate": {
             "type": "date",
-            "code": 6,
+            "code": 5,
             "name": "is less than",
             "duration": "days",
             "value": 5
@@ -411,7 +411,7 @@ SELECT message_id FROM email_sender WHERE MATCH (sender) AGAINST ('"interviews"'
 UNION
 SELECT message_id FROM email_subject WHERE MATCH (subject) AGAINST ('"UPDATED"' IN BOOLEAN MODE)
 UNION
-SELECT message_id FROM email_date WHERE received < '2023-07-22';
+SELECT message_id FROM email_date WHERE received > '2023-07-22';
 ```
 #### All Predicate
 For 'all' predicate I am using MYSQL INNER JOIN.
@@ -425,7 +425,7 @@ SELECT message_id FROM email_sender
 WHERE
  MATCH (sender) AGAINST ('"interviews"' IN BOOLEAN MODE)
  AND MATCH (subject) AGAINST ('"UPDATED"' IN BOOLEAN MODE)
- AND received < '2023-07-22';
+ AND received > '2023-07-22';
 ```
 
 ### DB Schema
