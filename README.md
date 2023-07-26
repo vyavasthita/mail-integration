@@ -361,7 +361,75 @@ Environment: All (development, qa, production etc.)
 
 <p align="right">(<a href="#readme-top">Back To Top</a>)</p>
 
+### Sql Query Generation
+Take example of below json rule.
+
+```sh
+"conditions": [
+    {
+        "field": "From",
+        "code": 1,
+        "predicate": {
+            "type": "str",
+            "code": 1,
+            "name": "contains",
+            "value": "interviews"
+        }
+    },
+    {
+        "field": "Subject",
+        "code": 3,
+        "predicate": {
+            "type": "str",
+            "code": 1,
+            "name": "contains",
+            "value": "UPDATED"
+        }
+    },
+    {
+        "field": "Date Received",
+        "code": 5,
+        "predicate": {
+            "type": "date",
+            "code": 6,
+            "name": "is less than",
+            "duration": "days",
+            "value": 5
+        }
+    }
+]
+```
+Now use this example for both 'all' and 'any' predicate.
+
+#### Any Predicate
+For 'any' predicate I am using MYSQL UNION.
+
+Generated Query.
+
+```
+SELECT message_id FROM email_sender WHERE MATCH (sender) AGAINST ('"interviews"' IN BOOLEAN MODE)
+UNION
+SELECT message_id FROM email_subject WHERE MATCH (subject) AGAINST ('"UPDATED"' IN BOOLEAN MODE)
+UNION
+SELECT message_id FROM email_date WHERE received < '2023-07-22';
+```
+#### All Predicate
+For 'all' predicate I am using MYSQL INNER JOIN.
+
+Generated Query.
+
+```
+SELECT message_id FROM email_sender
+ JOIN email_subject using (message_id)
+ JOIN email_date using (message_id)
+WHERE
+ MATCH (sender) AGAINST ('"interviews"' IN BOOLEAN MODE)
+ AND MATCH (subject) AGAINST ('"UPDATED"' IN BOOLEAN MODE)
+ AND received < '2023-07-22';
+```
+
 ### DB Schema
+
 ```
 CREATE TABLE IF NOT EXISTS label(  
     label_id varchar(25) NOT NULL,  
