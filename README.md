@@ -659,7 +659,7 @@ To run this project, you need to configure environment variables and configurati
     AUTH_PROVIDER_X509_CERT_URL_APP
     CLIENT_SECRET_APP
     REDIRECT_URIS_APP
-    API_URL_APP
+    API_URL_APP=https://gmail.googleapis.com/gmail/v1
     ```
   - Update '.env.test' 
   
@@ -675,7 +675,7 @@ To run this project, you need to configure environment variables and configurati
     AUTH_PROVIDER_X509_CERT_URL_TEST
     CLIENT_SECRET_TEST
     REDIRECT_URIS_TEST
-    API_URL_TEST
+    API_URL_TEST=https://gmail.googleapis.com/gmail/v1
     ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
